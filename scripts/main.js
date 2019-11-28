@@ -1,5 +1,9 @@
-function loadTypingDisplay () {
-    $('.typing-display').text(`Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+function loadTypingDisplay(text) {
+    $('.text-to-type').text(text);
+}
+
+function getText() {
+    let text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
         Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
@@ -17,7 +21,41 @@ function loadTypingDisplay () {
         elit ut dictum aliquet, felis nisl adipiscing sapien, 
         sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. 
         Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. 
-        Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.`);
+        Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.`;
+    return text;
 }
 
-$(document).ready(loadTypingDisplay());
+function loadTypingGame() {
+    let text = getText();
+    loadTypingDisplay(text);
+
+    let totalChars = text.length;
+    let currentChar = 0;
+    let typedChars = 0;
+
+    let $input = $('.typing-box');
+    $input.on('cut paste', function(e) {
+        e.preventDefault();
+    })
+    
+    $input.on('keypress', function(e) {
+        if (text.charCodeAt(currentChar) === e.which) {
+            $('body').append('<span style="color: red">good!</span>');
+        }
+        currentChar++;
+        typedChars++;
+        if (typedChars === totalChars) {
+            $input.prop('disabled', true);
+        }
+    });
+    
+    setTimeout(function() {
+        $('body').append(`<section class="section">
+            Game over! You typed ${(typedChars / 5)} words in 
+            15 seconds! (Accuracy not guaranteed)
+        </section>`);
+        $input.prop('disabled', true);
+    }, 15000);
+}
+
+$(document).ready(loadTypingGame());
