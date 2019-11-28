@@ -1,20 +1,34 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset='utf-8'>
-        <title>Typing Test Demo</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <!--link rel='stylesheet' type='text/css' href='main.css'-->
-        <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    </head>
-    <body>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Typing Test Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    <link rel='stylesheet' type='text/css' href='css/style.css'>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar">
+        <a id="nav-logo" href="#">TYPING GAME</a>
+
+        <div id="nav-links-div">
+            <a class="nav-link" href="#">Lobby</a>
+            <a class="nav-link" href="#">Leaderboards</a>
+            <a class="nav-link" href="#">Profile</a>
+        </div>
+    </div>
+
+    <div id="root">
         <div class="typing-display">
         </div>
+    </div>
+    <!-- <script src='scripts/main.js' type="module"></script> -->
+    <script src='scripts/render.js'></script>
+</body>
 
-        <script src='scripts/main.js' type="module"></script>
-    </body>
 </html>

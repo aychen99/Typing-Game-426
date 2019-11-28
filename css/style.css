@@ -1,0 +1,41 @@
+body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+#navbar {
+  border: 2px solid black;
+  padding: 24px 52px;
+}
+
+#nav-logo {
+  color: gray;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 12px;
+}
+
+#nav-links-div {
+  float: right;
+}
+
+.nav-link {
+  color: gray;
+  text-decoration: none;
+  margin: 0 12px;
+}
+
+#instructions {
+  text-align: center;
+}
+
+#typing-box {
+  margin: auto;
+  padding: 8px 32px 8px 32px;
+  width: 500px;
+  border: 2px solid black;
+  border-radius: 12px;
+}
