@@ -1,17 +1,46 @@
-body {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+@font-face {
+  font-family: Gluottine;
+  src: url(../fonts/gluottine.ttf);
 }
 
-h1 {
+body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  /* background-color: rgb(19, 19, 19); */
+  color: white
+}
+
+.is-centered {
   text-align: center;
 }
 
-#navbar {
-  border: 2px solid black;
-  padding: 24px 52px;
+.absolute-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-#nav-logo {
+#navbar-brand {
+  font-family: Gluottine;
+  font-size: 40px;
+  color: red;
+}
+
+#navbar-button {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+/* .navbar-container {
+  padding: 24px 52px;
+} */
+
+/* #navbar {
+  border: 2px solid black;
+  padding: 24px 52px;
+} */
+
+/* #nav-logo {
   color: gray;
   text-decoration: none;
   font-weight: bold;
@@ -26,16 +55,24 @@ h1 {
   color: gray;
   text-decoration: none;
   margin: 0 12px;
-}
+} */
 
-#instructions {
-  text-align: center;
-}
+/* #home-prompt {
+  margin-bottom: 0px;
+} */
 
 #typing-box {
   margin: auto;
-  padding: 8px 32px 8px 32px;
+  padding: 24px 32px;
   width: 500px;
-  border: 2px solid black;
+  border: 2px solid white;
   border-radius: 12px;
+}
+
+/* #typing-text {
+  font-weight: bold;
+} */
+
+#stopwatch {
+  margin-top: 8px;
 }

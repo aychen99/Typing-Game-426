@@ -1,0 +1,44 @@
+const $navbar = $(".navbar")
+const $footer = $(".footer")
+
+function renderNavbar() {
+  let navbar = `
+  <div class="container navbar-container">
+    <div class="navbar-brand">
+      <a class="navbar-item" id="navbar-brand" href="#">
+        Blaze Typing
+      </a>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Lobby</a>
+        <a class="navbar-item" href="#">Leaderboards</a>
+        <a class="navbar-item" href="#">Profile</a>
+
+        <div class="buttons">
+          <a class="button is-primary is-outlined" id="navbar-button">Login</a>
+          <a class="button is-primary">Signup</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  `
+
+  return navbar
+}
+
+function renderFooter() {
+  let footer = `
+  <div class="content has-text-centered">
+    Created by Cyanea Capillata from UNC COMP 426.
+  </div>
+  `
+
+  return footer
+}
+
+$(function() {
+  $navbar.append(renderNavbar())
+  $footer.append(renderFooter())
+})
