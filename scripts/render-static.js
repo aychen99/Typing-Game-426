@@ -32,8 +32,8 @@ function renderFooter() {
   let footer = `
   <div class="content has-text-centered">
     Created by Cyanea Capillata from UNC COMP 426.
-  </div>;
-  `
+  </div>
+  `;
 
   return footer;
 }
