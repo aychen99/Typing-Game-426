@@ -1,6 +1,6 @@
 function loadTypingDisplay(text) {
     $('#typing-display-section').append(`
-    <div class="typing-display">
+    <div id="typing-display">
         <div id="text-to-type">
 
         </div>
@@ -14,8 +14,16 @@ function loadTypingDisplay(text) {
                     id="typing-box"></input>
             </div>
         </div>
+        <div>
+            <p 
+            class="has-background-info has-text-white" 
+            id="timer">Remaining Time: Not started</p>
+        </div>
     </div>`);
     $('#text-to-type').append(`<div>${text}</div>`);
+
+    // TODO: Make input box larger and able to scroll down as 
+    // we type new lines in
 }
 
 function getText() {
@@ -48,6 +56,7 @@ function getText() {
 }
 
 function startTimer() {
+    let allowedTime = 15000;
     $('#0word').addClass('currentWord');
     setTimeout(function() {
         $('body').append(`<section class="section">
@@ -55,8 +64,20 @@ function startTimer() {
             15 seconds! (Accuracy not guaranteed)
         </section>`);
         $('#typing-box').prop('disabled', true);
-    }, 15000);
+    }, allowedTime);
     $('#typing-box').off('keypress', startTimer);
+
+    // Set up timer
+    $('#timer').html(`Remaining Time: ${allowedTime / 1000} seconds`);
+    let endTime = new Date().getTime() + allowedTime;
+    let timer = setInterval(function() {
+        let now = new Date().getTime();
+        let timeLeft = endTime - now;
+        $('#timer').html(`Remaining Time: ${Math.round(timeLeft / 1000)} seconds`);
+        if (timeLeft < 0) {
+            clearInterval(timer);
+        }
+    }, 1000);
 }
 
 function loadTypingGame() {
@@ -106,6 +127,11 @@ function loadTypingGame() {
             }
             
             console.log(wordID + '    ' + typedWords[currentWordIndex]);
+            if (typedWords[currentWordIndex] 
+                    != textWords[currentWordIndex] + ' ') {
+                $text.find(wordID).removeClass('cword').addClass('icword');
+            }
+
             $text.find(wordID).removeClass('currentWord')
             currentWordIndex++;
             $text.find('#' + currentWordIndex 
@@ -125,25 +151,25 @@ function loadTypingGame() {
             $text.find(wordID).removeClass('cword').addClass('icword');
             $input.addClass('ictextinput');
         }
-
-        // `<span class=`
     });
-    // When you type, you need to check that the letter is correct, and/or it is
-    // a space.
-    // If it is correct, then update the span for that particular letter
-    // If it is not correct, then also update the span
-    // If it is a space, then update the span
     
     $input.on('keydown', function(e) {
         if (e.which == 8) { // Backspace
+            // TODO: if the word was incorrect in the first place,
+            // after we've gone back to the previous word,
+            // Show it in the input box
+
             currentChar--;
-            if (currentChar < 0) {
+            if (currentChar < 0 && currentWordIndex > 0) {
                 currentWordIndex--;
                 currentChar = typedWords[currentWordIndex].length - 1;
             }
             
             typedWords[currentWordIndex] = typedWords[currentWordIndex].slice(0, 
                                         typedWords[currentWordIndex].length - 1);
+            if (typedWords[currentWordIndex] == undefined) {
+                typedWords[currentWordIndex] = '';
+            }
 
             let wordID = '#' + currentWordIndex + 'word';
             if (typedWords[currentWordIndex] 
