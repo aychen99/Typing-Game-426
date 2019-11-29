@@ -13,12 +13,12 @@ body {
   text-align: center;
 }
 
-.absolute-bottom {
+/*.absolute-bottom {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-}
+}*/
 
 #navbar-brand {
   font-family: Gluottine;
@@ -61,7 +61,12 @@ body {
   margin-bottom: 0px;
 } */
 
-#typing-box {
+#typing-section-header {
+  margin-bottom: 10px;
+  color: aqua;
+}
+
+#typing-section-text-container {
   margin: auto;
   padding: 24px 32px;
   width: 500px;
@@ -73,6 +78,13 @@ body {
   font-weight: bold;
 } */
 
-#stopwatch {
+#timer {
   margin-top: 8px;
+}
+
+#user-input {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
 }

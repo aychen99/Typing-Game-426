@@ -1,46 +1,69 @@
-const $root = $("#root")
+import loadTypingGame from './game-logic.js';
 
-function hello() {
-  console.log("hello")
-}
+const $root = $("#typing-section");
 
 function setupView() {
-  $root.append(renderTypingSection())
+  $root.append(renderTypingSectionHeader());
+  $root.append(renderTypingSectionTextContainer());
+  $root.append(renderTypingSectionInputBox());
+  $root.append(renderTypingSectionTimer());
+  $("#typing-section-text-container").append(renderTextToType());
 
-  $("#typing-section > .container").append(renderTypingBox())
-  $("#typing-section > .container").append(renderStopwatch())
+  loadTypingGame();
 }
 
-function renderTypingSection() {
-  let typingSection = `
-  <section class="section" id="typing-section">
-    <div class="container">
+function renderTypingSectionHeader() {
+  let typingSectionHeader = `
+    <div class="container" id="typing-section-header">
       <h3 class="title is-3 is-centered">WELCOME TO BLAZE TYPING 426</h3>
       <h5 class="subtitle is-5 is-centered" id="home-prompt">Type the following text:</h5>
     </div>
-  </section>
-  `
+  `;
 
-  return typingSection
+  return typingSectionHeader;
 }
 
-function renderTypingBox() {
-  let typingBox = `
-  <div id="typing-box">
-    <p id="typing-text">Gr8 b8, m8. I rel8, str8 appreci8, and congratul8. I r8 this b8 an 8/8. Plz no h8, I’m str8 ir8. Cre8 more, can’t w8. We should convers8, I won’t ber8, my number is 8888888, ask for N8. No calls l8 or out of st8. If on a d8, ask K8 to loc8. Even with a full pl8, I always have time to communic8 so don’t hesit8</p>
-  `
-
-  typingBox += '</div>'
-
-  return typingBox
+function renderTypingSectionTextContainer() {
+  return `
+    <div class="container" id="typing-section-text-container">
+    </div>
+  `;
 }
 
-function renderStopwatch() {
-  let stopwatch = `
-  <p class="is-centered" id="stopwatch"><b>Time Elapsed: 1:46</b></p>
-  `
+function renderTypingSectionInputBox() {
+  return `
+    <div class="field">
+      <div class="control">
+        <input 
+          class="input is-primary" 
+          type="text" 
+          placeholder="When ready, type in here to begin!"
+          spellcheck="false"
+          id="user-input"></input>
+      </div>
+    </div>
+  `;
 
-  return stopwatch
+  // TODO: Make input box larger and able to scroll down, rather than sideways,
+  // as we type new lines in
+}
+
+function renderTextToType() {
+  return `
+    <div id="text-to-type">
+    </div>
+  `;
+}
+
+function renderTypingSectionTimer() {
+  return `
+    <p 
+    class="is-centered 
+      has-background-info 
+      has-text-white 
+      has-text-weight-bold" 
+    id="timer"><b>Time Elapsed: 0:00</b></p>
+  `;
 }
 
 function renderTypingStats() {
@@ -48,6 +71,5 @@ function renderTypingStats() {
 }
 
 $(function() {
-  console.log("everything has loaded")
-  setupView()
-})
+  setupView();
+});

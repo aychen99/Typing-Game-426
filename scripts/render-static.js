@@ -1,5 +1,5 @@
-const $navbar = $(".navbar")
-const $footer = $(".footer")
+const $navbar = $(".navbar");
+const $footer = $(".footer");
 
 function renderNavbar() {
   let navbar = `
@@ -23,22 +23,22 @@ function renderNavbar() {
       </div>
     </div>
   </div>
-  `
+  `;
 
-  return navbar
+  return navbar;
 }
 
 function renderFooter() {
   let footer = `
   <div class="content has-text-centered">
     Created by Cyanea Capillata from UNC COMP 426.
-  </div>
+  </div>;
   `
 
-  return footer
+  return footer;
 }
 
 $(function() {
-  $navbar.append(renderNavbar())
-  $footer.append(renderFooter())
-})
+  $navbar.append(renderNavbar());
+  $footer.append(renderFooter());
+});
