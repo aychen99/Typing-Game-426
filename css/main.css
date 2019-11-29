@@ -1,0 +1,26 @@
+.cword {
+    color: green;
+}
+
+.icword {
+    color: red;
+}
+
+.cchar {
+
+}
+
+.icchar {
+
+}
+
+.currentWord {
+    text-decoration: underline;
+}
+
+.ctextinput {
+}
+
+.ictextinput {
+    background-color: red;
+}
