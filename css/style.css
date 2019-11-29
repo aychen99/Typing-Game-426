@@ -1,0 +1,90 @@
+@font-face {
+  font-family: Gluottine;
+  src: url(../fonts/gluottine.ttf);
+}
+
+body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  /* background-color: rgb(19, 19, 19); */
+  color: white
+}
+
+.is-centered {
+  text-align: center;
+}
+
+/*.absolute-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}*/
+
+#navbar-brand {
+  font-family: Gluottine;
+  font-size: 40px;
+  color: red;
+}
+
+#navbar-button {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+/* .navbar-container {
+  padding: 24px 52px;
+} */
+
+/* #navbar {
+  border: 2px solid black;
+  padding: 24px 52px;
+} */
+
+/* #nav-logo {
+  color: gray;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 12px;
+}
+
+#nav-links-div {
+  float: right;
+}
+
+.nav-link {
+  color: gray;
+  text-decoration: none;
+  margin: 0 12px;
+} */
+
+/* #home-prompt {
+  margin-bottom: 0px;
+} */
+
+#typing-section-header {
+  margin-bottom: 10px;
+  color: aqua;
+}
+
+#typing-section-text-container {
+  margin: auto;
+  padding: 24px 32px;
+  width: 500px;
+  border: 2px solid white;
+  border-radius: 12px;
+}
+
+/* #typing-text {
+  font-weight: bold;
+} */
+
+#timer {
+  margin-top: 8px;
+}
+
+#user-input {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}

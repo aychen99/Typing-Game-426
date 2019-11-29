@@ -1,0 +1,27 @@
+{
+  "name": "typing-game-426",
+  "version": "1.0.0",
+  "description": "A website to practice typing, made for UNC's Comp 426, Fall 2019.",
+  "main": "sass/styles.scss",
+  "dependencies": {
+    "bulma": "^0.8.0",
+    "node-sass": "^4.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "css-build": "node-sass --omit-source-map-url sass/styles.scss css/bulma_style.css",
+    "css-watch": "npm run css-build -- --watch",
+    "start": "npm run css-watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aychen99/Typing-Game-426.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aychen99/Typing-Game-426/issues"
+  },
+  "homepage": "https://github.com/aychen99/Typing-Game-426#readme"
+}
