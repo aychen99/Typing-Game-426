@@ -1,4 +1,4 @@
-import config from "../config.js"
+import config from "../config.js";
 
 let url = config.url;
 
@@ -16,9 +16,41 @@ function installSignupButton() {
 
 function installPromptButtonHandlers(mode) {
     if (mode == 'Login') {
-
-    } else {
-
+        $('#submit-user-action').on('click', async function() {
+            try {
+                let result = await axios({
+                    method: 'post',
+                    url: url + '/account/login',
+                    data: {
+                        name: $('#username').val(),
+                        pass: $('#password').val()
+                    }
+                });
+                location.reload();
+            } catch {
+                $('#uap-header').html(`
+                    <span class="has-text-danger">Login failed! Try again!</span>
+                `);
+            }
+        });
+    } else if (mode == 'Sign Up') {
+        $('#submit-user-action').on('click', async function() {
+            try {
+                let result = await axios({
+                    method: 'post',
+                    url: url + '/account/create',
+                    data: {
+                        name: $('#username').val(),
+                        pass: $('#password').val()
+                    }
+                });
+                $('#user-action-prmot-background').remove();
+            } catch {
+                $('#uap-header').html(`
+                    <span class="has-text-danger">Sign-up failed! Try again!</span>
+                `);
+            }
+        });
     }
 
     $('#cancel-user-action').on('click', function() {
@@ -30,7 +62,7 @@ function createUserActionPrompt(mode) {
     let $prompt = $(`
         <div class="prompt-background" id="user-action-prompt-background">
             <div class="user-prompt">
-                <p class="has-text-centered is-size-3">
+                <p class="has-text-centered is-size-4" id="uap-header">
                     ${mode} here!
                 </p>
                 <div class="field">
@@ -39,16 +71,18 @@ function createUserActionPrompt(mode) {
                         <input class="input" 
                                 type="text" 
                                 placeholder="Username"
-                                name="username">
+                                name="username"
+                                id="username">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label has-text-link">Password:</label>
                     <div class="control">
                         <input class="input" 
-                                type="text" 
+                                type="password" 
                                 placeholder="Password"
-                                name="password">
+                                name="password"
+                                id="password">
                     </div>
                 </div>
                 <br>
