@@ -1,8 +1,28 @@
-# Typing-Game-426
-A website to practice typing, made for UNC's Comp 426, Fall 2019.
+# Blaze Typing 426
+A website where people can practice typing, made for UNC's COMP 426, Fall 2019.
 
-Required dependencies: 
-* npm install node
-* npm install sass
+## Getting Started
 
-Clone this repo, then run "npm ci" to automatically install the above dependencies.
+### Prerequisites / Dependencies
+* Node.js
+* Bulma
+* Sass
+
+### Installing
+Download and install Node.js -> https://nodejs.org/en/download/
+
+After cloning/downloading, run this command in the root directory to install all of the dependencies
+```
+npm ci
+```
+
+## Deployment
+Install browser-sync by running the following command
+```
+npm install -g browser-sync
+```
+
+Then run this command in the root directory of this project
+```
+browser-sync start -sw
+```
