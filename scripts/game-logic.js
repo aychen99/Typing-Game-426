@@ -38,31 +38,6 @@ function getText() {
     return text;
 }
 
-function startTimer() {
-    let allowedTime = 15000;
-    $('#0word').addClass('currentWord');
-    setTimeout(function() {
-        $('body').append(`<section class="section">
-            Game over! You typed ${0} words in 
-            15 seconds! (Accuracy not guaranteed)
-        </section>`);
-        $('#user-input').prop('disabled', true);
-    }, allowedTime);
-    $('#user-input').off('keypress', startTimer);
-
-    // Set up timer
-    $('#timer').html(`Remaining Time: ${allowedTime / 1000} seconds`);
-    let endTime = new Date().getTime() + allowedTime;
-    let timer = setInterval(function() {
-        let now = new Date().getTime();
-        let timeLeft = endTime - now;
-        $('#timer').html(`Remaining Time: ${Math.round(timeLeft / 1000)} seconds`);
-        if (timeLeft < 0) {
-            clearInterval(timer);
-        }
-    }, 1000);
-}
-
 export default function loadTypingGame() {
     let text = getText();
 
@@ -87,7 +62,14 @@ export default function loadTypingGame() {
     let $text = $('#text-to-type');
     $input.on('cut paste', function(e) {
         e.preventDefault();
-    })
+    });
+    $input.on('keydown', function(e) {
+        // Prevent movement with up and down keys
+        if (e.which == 38 || e.which == 40) {
+            e.preventDefault();
+        }
+        // TODO: determine if home and end keys should also be disabled
+    });
 
     // Typing Test Logic
     let currentChar = 0;
@@ -95,7 +77,49 @@ export default function loadTypingGame() {
     let typedWords = new Array(totalWords).fill('');
     // let numErrors = 0;
 
-    $input.on('keypress', startTimer);
+    let timerVar = null;
+    function startCountdownTimer() {
+        let allowedTime = 30000;
+        $('#0word').addClass('currentWord');
+        setTimeout(function() {
+            $('#typing-section').append(`<section class="section">
+                Game over! You typed ${0} words in 
+                15 seconds! (Accuracy not guaranteed)
+            </section>`);
+            $('#user-input').prop('disabled', true);
+        }, allowedTime);
+        $('#user-input').off('keypress', startCountdownTimer);
+    
+        // Set up timer
+        $('#timer').html(`Remaining Time: ${allowedTime / 1000} seconds`);
+        let endTime = new Date().getTime() + allowedTime;
+        timerVar = setInterval(function() {
+            let now = new Date().getTime();
+            let timeLeft = endTime - now;
+            $('#timer').html(`Remaining Time: ${Math.round(timeLeft / 1000)} seconds`);
+            if (timeLeft < 0) {
+                clearInterval(timerVar);
+            }
+        }, 1000);
+    }
+    
+    function startStopwatchTimer() {
+        $('#0word').addClass('currentWord');
+        $('#user-input').off('keypress', startStopwatchTimer);
+    
+        $('#timer').html(`Time Elapsed: 0 seconds`);
+        let startTime = new Date().getTime();
+        timerVar = setInterval(function() {
+            let now = new Date().getTime();
+            let timeElapsed = now - startTime;
+            $('#timer').html(`Time Elapsed: 
+                                ${Math.round(timeElapsed / 1000)} seconds`);
+        }, 1000);
+    }
+
+    $input.on('keypress', startCountdownTimer);
+
+    let linesScrolled = 0;
 
     // Word-based detection, as opposed to character-based detection
     $input.on('keypress', function(e) {
@@ -109,7 +133,6 @@ export default function loadTypingGame() {
                 return;
             }
             
-            console.log(wordID + '    ' + typedWords[currentWordIndex]);
             if (typedWords[currentWordIndex] 
                     != textWords[currentWordIndex] + ' ') {
                 $text.find(wordID).removeClass('cword').addClass('icword');
@@ -120,6 +143,10 @@ export default function loadTypingGame() {
             $text.find('#' + currentWordIndex 
                                 + 'word').addClass('currentWord');
             currentChar = 0;
+            if (currentWordIndex == totalWords) {
+                clearInterval(timerVar);
+                $('#user-input').prop('disabled', true);
+            }
             return;
         }
 
@@ -134,6 +161,8 @@ export default function loadTypingGame() {
             $text.find(wordID).removeClass('cword').addClass('icword');
             $input.addClass('ictextinput');
         }
+
+        // TODO: handle pressing enter
     });
     
     $input.on('keydown', function(e) {
@@ -144,8 +173,14 @@ export default function loadTypingGame() {
 
             currentChar--;
             if (currentChar < 0 && currentWordIndex > 0) {
+                $text.find('#' 
+                        + currentWordIndex + 'word').removeClass(`currentWord
+                                                                  icword
+                                                                  cword`);
                 currentWordIndex--;
                 currentChar = typedWords[currentWordIndex].length - 1;
+                $text.find('#' 
+                        + currentWordIndex + 'word').addClass('currentWord');
             }
             
             typedWords[currentWordIndex] = typedWords[currentWordIndex].slice(0, 
@@ -158,10 +193,21 @@ export default function loadTypingGame() {
             if (typedWords[currentWordIndex] 
                     == textWords[currentWordIndex].slice(0, 
                         typedWords[currentWordIndex].length)) {
-                // Backspace brought us back to a correct word
-                $text.find(wordID).removeClass('icword').addClass('cword');
+                // Backspace brought us back to a correct word or word part
+                $text.find(wordID).removeClass('icword');
+                if (typedWords[currentWordIndex].length != 0) {
+                    $text.find(wordID).addClass('cword');
+                }
                 $input.removeClass('ictextinput');
             }
+        }
+    });
+
+    $input.on('scroll', function(e) {
+        linesScrolled++;
+        if (linesScrolled > 3) {
+            console.log('scroll')
+            $text.scrollTop((linesScrolled - 3)*20);
         }
     });
 

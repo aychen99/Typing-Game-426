@@ -34,12 +34,11 @@ function renderTypingSectionInputBox() {
   return `
     <div class="field">
       <div class="control">
-        <input 
-          class="input is-primary" 
-          type="text" 
+        <textarea 
+          class="input is-primary"  
           placeholder="When ready, type in here to begin!"
           spellcheck="false"
-          id="user-input"></input>
+          id="user-input"></textarea>
       </div>
     </div>
   `;
@@ -62,7 +61,7 @@ function renderTypingSectionTimer() {
       has-background-info 
       has-text-white 
       has-text-weight-bold" 
-    id="timer"><b>Time Elapsed: 0:00</b></p>
+    id="timer">Time Elapsed: 0:00</p>
   `;
 }
 

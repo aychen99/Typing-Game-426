@@ -106,12 +106,25 @@ body {
   border-radius: 12px;
 }
 
+#text-to-type {
+  height: 10em;
+  width: 100%;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+#text-to-type::-webkit-scrollbar {
+  display: none;
+}
+
 /* #typing-text {
   font-weight: bold;
 } */
 
 #timer {
   margin-top: 8px;
+  width: 500px;
+  margin: auto;
 }
 
 #user-input {
@@ -119,4 +132,9 @@ body {
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
+  overflow-y: hidden;
+  height: 4em;
+  width: 500px;
+  padding-left: 32px;
+  padding-right: 32px;
 }
