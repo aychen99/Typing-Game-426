@@ -1,3 +1,5 @@
+import installButtons from "./render-login.js"
+
 const $navbar = $(".navbar");
 const $footer = $(".footer");
 
@@ -10,15 +12,15 @@ function renderNavbar() {
       </a>
     </div>
 
-    <div class="navbar-menu">
+    <div class="navbar-menu is-active">
       <div class="navbar-end">
         <a class="navbar-item" href="#">Lobby</a>
         <a class="navbar-item" href="#">Leaderboards</a>
         <a class="navbar-item" href="#">Profile</a>
 
         <div class="buttons">
-          <a class="button is-primary is-outlined" id="navbar-button">Login</a>
-          <a class="button is-primary">Signup</a>
+          <a class="button is-primary is-outlined" id="login-button">Login</a>
+          <a class="button is-primary" id="signup-button">Signup</a>
         </div>
       </div>
     </div>
@@ -41,4 +43,5 @@ function renderFooter() {
 $(function() {
   $navbar.append(renderNavbar());
   $footer.append(renderFooter());
+  installButtons();
 });
