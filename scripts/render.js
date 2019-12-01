@@ -15,8 +15,15 @@ function setupView() {
 function renderTypingSectionHeader() {
   let typingSectionHeader = `
     <div class="container" id="typing-section-header">
-      <h3 class="title is-3 is-centered">WELCOME TO BLAZE TYPING 426</h3>
-      <h5 class="subtitle is-5 is-centered" id="home-prompt">Type the following text:</h5>
+      <h3
+      class="
+        title
+        is-3
+        is-centered
+        dark-mode-title">
+        WELCOME TO BLAZE TYPING 426
+      </h3>
+      <h5 class="subtitle is-5 is-centered dark-mode-subtitle" id="home-prompt">Type the following text:</h5>
     </div>
   `;
 
@@ -25,7 +32,7 @@ function renderTypingSectionHeader() {
 
 function renderTypingSectionTextContainer() {
   return `
-    <div class="container" id="typing-section-text-container">
+    <div class="container dark-mode-box" id="typing-section-text-container">
     </div>
   `;
 }
@@ -49,7 +56,7 @@ function renderTypingSectionInputBox() {
 
 function renderTextToType() {
   return `
-    <div id="text-to-type">
+    <div class="dark-mode-text" id="text-to-type">
     </div>
   `;
 }

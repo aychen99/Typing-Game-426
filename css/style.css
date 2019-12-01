@@ -5,12 +5,71 @@
 
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  /* background-color: rgb(19, 19, 19); */
+}
+
+.dark-mode-body {
+  background-color: rgb(32, 32, 32);
   color: white;
+}
+
+.light-mode-body {
+  background-color: rgb(255, 255, 255);
+  color: black;
+}
+
+.dark-mode-box {
+  border: 2px solid;
+  border-radius: 12px;
+  border-color: white;
+}
+
+.light-mode-box {
+  border: 2px solid;
+  border-radius: 12px;
+  border-color: black;
 }
 
 .is-centered {
   text-align: center;
+}
+
+.light-mode-title {
+  color: black;
+}
+
+.dark-mode-title {
+  color: white;
+}
+
+.light-mode-subtitle {
+  color: gray;
+}
+
+.dark-mode-subtitle {
+  color: rgb(219, 219, 219);
+}
+
+.light-mode-text {
+  color: black;
+}
+
+.dark-mode-text {
+  color: white;
+}
+
+.light-mode-footer {
+  background-color: whitesmoke;
+}
+
+.dark-mode-footer {
+  background-color: black;
+}
+
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /*.absolute-bottom {
@@ -102,8 +161,6 @@ body {
   margin: auto;
   padding: 24px 32px;
   width: 500px;
-  border: 2px solid white;
-  border-radius: 12px;
 }
 
 #text-to-type {
