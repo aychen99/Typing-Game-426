@@ -1,9 +1,14 @@
 import installButtons from "./render-login.js"
 
+/***
+ * This file is used to render elements that will be the same for EVERY page. E.g.) Navbars and footers are the same on every page, so they are defined here.
+ ***/
+
+// HTML classes
 const $navbar = $(".navbar");
 const $footer = $(".footer");
 
-// Theme state
+// Theme state, default is dark
 let isDark = true;
 
 function renderNavbar() {
@@ -100,6 +105,10 @@ function toDarkMode() {
   $(".footer").removeClass("light-mode-footer");
 }
 
+/**
+ * Toggles between light and dark mode when the toggle button is pressed
+ * @param {*} e 
+ */
 function handleThemeButtonPress(e) {
   if (isDark) {
     toLightMode();
@@ -110,6 +119,9 @@ function handleThemeButtonPress(e) {
   isDark = !isDark;
 }
 
+/**
+ * After the page finishes loading, renders everything and sets up event listeners
+ */
 $(function() {
   $navbar.append(renderNavbar());
   $footer.append(renderFooter());

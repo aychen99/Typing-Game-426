@@ -1,5 +1,9 @@
 import loadTypingGame from './game-logic.js';
 
+/***
+ * This file is used to render elements on the home page.
+ ***/
+
 const $root = $("#typing-section");
 
 function setupView() {
@@ -12,6 +16,9 @@ function setupView() {
   loadTypingGame();
 }
 
+/**
+ * Renders the title of the typing section.
+ */
 function renderTypingSectionHeader() {
   let typingSectionHeader = `
     <div class="container" id="typing-section-header">
@@ -30,6 +37,9 @@ function renderTypingSectionHeader() {
   return typingSectionHeader;
 }
 
+/**
+ * Renders a box that contains the text for the user to type.
+ */
 function renderTypingSectionTextContainer() {
   return `
     <div class="container dark-mode-box" id="typing-section-text-container">
@@ -37,6 +47,9 @@ function renderTypingSectionTextContainer() {
   `;
 }
 
+/**
+ * Renders an input field where the user can start the typing test.
+ */
 function renderTypingSectionInputBox() {
   return `
     <div class="field">
@@ -54,6 +67,9 @@ function renderTypingSectionInputBox() {
   // as we type new lines in
 }
 
+/**
+ * Renders the text that the user will type for the typing test.
+ */
 function renderTextToType() {
   return `
     <div class="dark-mode-text" id="text-to-type">
@@ -61,6 +77,9 @@ function renderTextToType() {
   `;
 }
 
+/**
+ * Renders the countdown timer of the typing test.
+ */
 function renderTypingSectionTimer() {
   return `
     <p 
