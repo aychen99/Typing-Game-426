@@ -36,6 +36,7 @@ function installPromptButtonHandlers(mode) {
             pass: $("#password").val()
           }
         });
+        window.localStorage.setItem('jwt', result.data['jwt']);
         location.reload();
       } catch {
         $("#uap-header").html(`
@@ -54,7 +55,11 @@ function installPromptButtonHandlers(mode) {
             pass: $("#password").val()
           }
         });
-        $("#user-action-prmot-background").remove();
+        $("#user-action-prompt-background").find('.field').remove();
+        $('#uap-header').html('Signup successful! Please close this '
+                              + 'panel and log in!');
+        $('#submit-user-action').remove();
+        $('#cancel-user-action').html('Close');
       } catch {
         $("#uap-header").html(`
                     <span class="has-text-danger">Sign-up failed! Try again!</span>
@@ -109,7 +114,7 @@ function createUserActionPrompt(mode) {
   installPromptButtonHandlers(mode);
 }
 
-export default function installButtons() {
+export default function installButtonsNotLoggedIn() {
   installLoginButton();
   installSignupButton();
 }
