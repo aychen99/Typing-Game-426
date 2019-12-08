@@ -5,6 +5,7 @@ let url = config.url;
 function installLogoutButton() {
     $('#logout-button').on('click', function () {
         localStorage.removeItem('jwt');
+        localStorage.removeItem('typing-username');
         location.reload();
     });
 }
@@ -47,7 +48,35 @@ function installSettingsButton() {
 
         try {
             let settings = await getUserSettings();
-            console.log(settings);
+
+            $('body').append(`
+                <div class="prompt-background" id="settings-prompt-background">
+                    <div class="menu-prompt">
+                        <p class="has-text-centered is-size-3">
+                            Settings for <span class="has-text-info">${localStorage['typing-username']}</span>:
+                        </p>
+                        <br>
+                        <div>
+                            <span class="has-text-weight-bold">Games Played: </span>
+                            <span class="has-text-gray">${settings['games_played']}</span>
+                        </div>
+                        <div>
+                            <span class="has-text-weight-bold">Words Per Minute: </span>
+                            <span class="has-text-gray">${settings['wpm']}</span>
+                        </div>
+                        <div>
+                            <span class="has-text-weight-bold">Theme: </span>
+                            <span class="has-text-gray">${settings['theme']}</span>
+                        </div>
+
+                        <br>
+                        <button class="button is-warning" id="close-prompt">Close</button>
+                    </div>
+                </div>
+            `);
+            $('#close-prompt').on('click', function() {
+                $('#settings-prompt-background').remove();
+            });
         } catch {
             $('body').append(`
                 <div class="prompt-background" id="error-prompt-background">

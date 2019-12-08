@@ -37,6 +37,7 @@ function installPromptButtonHandlers(mode) {
           }
         });
         window.localStorage.setItem('jwt', result.data['jwt']);
+        window.localStorage.setItem('typing-username', result.data['name']);
         location.reload();
       } catch {
         $("#uap-header").html(`
