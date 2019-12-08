@@ -1,4 +1,5 @@
-import installButtons from "./render-login.js"
+import installButtonsNotLoggedIn from "./render-login.js"
+import installButtonsLoggedIn from "./render-logged-in.js"
 
 /***
  * This file is used to render elements that will be the same for EVERY page. E.g.) Navbars and footers are the same on every page, so they are defined here.
@@ -12,6 +13,8 @@ const $footer = $(".footer");
 let isDark = true;
 
 function renderNavbar() {
+  let buttonDivHTML = getButtonsHTML();
+
   let navbar = `
   <div class="container navbar-container">
     <div class="navbar-brand">
@@ -26,17 +29,31 @@ function renderNavbar() {
         <a class="navbar-item" href="#">Leaderboards</a>
         <a class="navbar-item" href="#">Profile</a>
 
-        <div class="buttons">
-          <a class="button is-primary is-outlined" id="login-button">Login</a>
-          <a class="button is-primary" id="signup-button">Signup</a>
-          <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
-        </div>
+        ${buttonDivHTML}
       </div>
     </div>
   </div>
   `;
 
   return navbar;
+}
+
+function getButtonsHTML() {
+  if (localStorage.jwt) {
+    // User is logged in
+    return `<div class="buttons">
+      <a class="button is-primary is-outlined" id="logout-button">Logout</a>
+      <a class="button is-primary" id="settings-button">Settings</a>
+      <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
+    </div>`;
+  } else {
+    // User is not logged in
+    return `<div class="buttons">
+      <a class="button is-primary is-outlined" id="login-button">Login</a>
+      <a class="button is-primary" id="signup-button">Signup</a>
+      <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
+    </div>`;
+  }
 }
 
 function renderFooter() {
@@ -129,5 +146,10 @@ $(function() {
   // Add event listeners
   $("#theme-button").on("click", handleThemeButtonPress);
 
-  installButtons();
+  // Change button event handlers based on if user is logged in or not
+  if (localStorage.jwt) {
+    installButtonsLoggedIn();
+  } else {
+    installButtonsNotLoggedIn();
+  }
 });
