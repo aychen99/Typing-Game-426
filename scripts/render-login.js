@@ -24,12 +24,18 @@ function installSignupButton() {
   });
 }
 
+function installLobbyButton() {
+  $("#lobby-button").on("click", function () {
+    createLobbyList();
+  })
+}
+
 async function createDefaultLobbies() {
   let defaultLobby = new Lobby("Default");
   lobbies.push(defaultLobby);
 
   try {
-    axios.post( url + "/public/Lobbies", {
+    axios.post( url + "/public/Lobbies/", {
       data: {
           name: lobbies[0].name,
           pass: lobbies[0].passcode,
@@ -38,6 +44,7 @@ async function createDefaultLobbies() {
       }
     })
     .then(response => { 
+      console.log(lobbies[0].name);
       console.log(response)
     })
     .catch(error => {
@@ -159,72 +166,48 @@ function createUserActionPrompt(mode) {
   installPromptButtonHandlers(mode);
 }
 
-function installLobbyButton() {
+function createLobbyList() {
   $('#lobby-button').on('click', async function () {
-    async function getUserSettings() {
+    async function getLobbies() {
       try {
         let result = await axios({
           method: 'get',
-          url: url + '/user/settings',
-          headers: { 'Authorization': 'Bearer ' + localStorage.jwt },
+          url: url + '/public/Lobbies',
         });
-        return result.data.result;
+        console.log(result.data);
+        console.log("GAYYYYYYY");
+        return result.data;
       }
       catch (e) {
         // If user does not have settings configured,
         // configure it first
-        await axios({
-          method: 'post',
-          url: url + '/user/settings/',
-          headers: { 'Authorization': 'Bearer ' + localStorage.jwt },
-          data: {
-            data: {
-              games_played: '0',
-              wpm: '0',
-              theme: 'dark'
-            }
-          }
-        });
-        let result = await axios({
-          method: 'get',
-          url: url + '/user/settings',
-          headers: { 'Authorization': 'Bearer ' + localStorage.jwt },
-        });
-        return result.data.result;
+        return e;
       }
 
     }
 
     try {
-      let settings = await getUserSettings();
-
+      let lobbies = await getLobbies();
+      console.log(lobbies.result.name);
       $('body').append(`
-                <div class="prompt-background" id="settings-prompt-background">
+                <div class="prompt-background" id="lobbies-prompt-background">
                     <div class="menu-prompt">
                         <p class="has-text-centered is-size-3">
-                            Settings for <span class="has-text-info">${localStorage['typing-username']}</span>:
+                            Lobbies:
                         </p>
                         <br>
-                        <div>
-                            <span class="has-text-weight-bold">Games Played: </span>
-                            <span class="has-text-gray">${settings['games_played']}</span>
-                        </div>
-                        <div>
-                            <span class="has-text-weight-bold">Words Per Minute: </span>
-                            <span class="has-text-gray">${settings['wpm']}</span>
-                        </div>
-                        <div>
-                            <span class="has-text-weight-bold">Theme: </span>
-                            <span class="has-text-gray">${settings['theme']}</span>
-                        </div>
 
+                        <div>
+                            <span class="has-text-gray">${lobbies.result.name}</span>
+                        </div>
+                        
                         <br>
                         <button class="button is-warning" id="close-prompt">Close</button>
                     </div>
                 </div>
             `);
       $('#close-prompt').on('click', function () {
-        $('#settings-prompt-background').remove();
+        $('#lobbies-prompt-background').remove();
       });
     } catch {
       $('body').append(`

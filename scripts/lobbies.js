@@ -4,12 +4,17 @@ let lobby;
 //A lobby class
 export default class Lobby {
     constructor (name) {
-        lobby = {
-            users: [],
-            name: name,
-            hasPasscode: false,
-            passcode: "",
-        }
+        this.name = name;
+        this.users = [];
+        this.hasPasscode = false;
+        this.passcode = "";
+
+        // lobby = {
+        //     users: [],
+        //     name: name,
+        //     hasPasscode: false,
+        //     passcode: "",
+        // }
 
     }
 
