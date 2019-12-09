@@ -25,7 +25,7 @@ function renderNavbar() {
 
     <div class="navbar-menu is-active">
       <div class="navbar-end">
-        <a class="navbar-item" href="#">Lobby</a>
+        <a class="navbar-item" href="#" id="lobby-button">Lobby</a>
         <a class="navbar-item" href="#">Leaderboards</a>
         <a class="navbar-item" href="#">Profile</a>
 
