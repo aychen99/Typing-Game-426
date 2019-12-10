@@ -1,4 +1,5 @@
 import config from "../config.js"
+import makeLobbies from "./lobbies.js"
 
 let url = config.url;
 
@@ -100,4 +101,5 @@ function installSettingsButton() {
 export default function installButtonsLoggedIn() {
     installLogoutButton();
     installSettingsButton();
+    makeLobbies();
 }
