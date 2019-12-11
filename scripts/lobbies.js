@@ -27,8 +27,11 @@ export function installLobbyButton() {
       let result = await axios({
         method: 'get',
         url: url + '/public/Lobbies',
-      });
-
+      })
+      // .then(response => {
+      //   console.log(response)
+      // });
+      console.log(result)
       return result.data.result;
     }
     catch (e) {
@@ -41,9 +44,7 @@ export function installLobbyButton() {
   async function createLobbyList() {
       try {
         let lobbies = await getLobbies();
-        console.log(lobbies)
         let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
-        //console.log(lobbyArray);
         $('body').append(`
                   <div class="prompt-background" id="lobbies-prompt-background">
                       <div class="menu-prompt">
@@ -70,10 +71,12 @@ export function installLobbyButton() {
           createALobby();
           e.preventDefault();
         })
-        // $('#delete-prompt').on('click', function (e) {
-        //   deleteLobby();
-        //   e.preventDefault();
-       // });
+        $('#delete-prompt').on('click', async function (e) {
+          await deleteLobby();
+          $('#lobbies-prompt-background').remove();
+          createLobbyList();
+          e.preventDefault();
+       });
       } catch (e) {
         console.log(e);
       }
@@ -113,7 +116,7 @@ export function installLobbyButton() {
                   </div>
               `);
         $('#close-mini-prompt').on('click', function (e) {
-            $('#error-mini-prompt-background').remove();
+            $('#create-mini-prompt-background').remove();
             e.preventDefault();
         })
         $('#create-mini-prompt').on('click', async function() {
@@ -150,7 +153,7 @@ export function installLobbyButton() {
             hasP = true;
         }
 
-      try {
+
         await axios.post( url + `/public/Lobbies/${hold}`, {
             data: {
                 name : hold,
@@ -160,33 +163,29 @@ export function installLobbyButton() {
                 owner : localStorage['typing-username'], 
             }
           })
-          .then(response => { 
-            console.log($(localStorage['typing-username']))
-            console.log(response)
-          })
           .catch(error => {
             console.log(error.response)
           });
-      } catch (e) {
-        console.log(e)
       }
+
+
+
+
+  async function deleteLobby() {
+    let thisURL;
+    let lobbies = await getLobbies();
+    let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+    for (let i = 0; i < lobbyArray.length; i++) {
+      if (lobbyArray[i].owner == localStorage['typing-username']) {
+        try {
+          thisURL = url + `/public/Lobbies/${lobbyArray[i].name}`;
+          console.log(thisURL);
+          await axios.delete(thisURL);
+
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    }
+    return false;
   }
-
-
-
-  // async function deleteLobby() {
-  //   let lobbies = await getLobbies();
-  //   let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
-  //   //console.log(lobbyArray)
-  //   for (let i = 0; i < lobbyArray.length; i++) {
-  //     if (lobbyArray[i].owner == localStorage['typing-username']) {
-  //       try {
-  //         url = url + `/public/Lobbies/`;
-  //         axios.delete(url);
-  //       } catch (e) {
-  //         console.log(e);
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
