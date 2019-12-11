@@ -1,5 +1,5 @@
-function loadTextToType(formattedText) {
-    $('#text-to-type').html(formattedText);
+function loadTextToType(textAsHTML) {
+    $('#text-to-type').html(textAsHTML);
 }
 
 function getText() {
@@ -38,28 +38,66 @@ function getText() {
     return text;
 }
 
+function createGameOverScreen(totalCharsTyped, wordErrorNum, textWordsArray, totalTimeMS) {
+    $('#typing-section').append(`
+        <section class="section">
+            Game over! Your adjusted WPM was ${getAdjustedWPM}, in a total 
+            typing time of ${Math.round(totalTimeMS/1000)} seconds! 
+            (Accuracy not guaranteed yet)
+        </section>
+    `);
+    $('#user-input').prop('disabled', true);
+}
+
+function updateErrorDisplay(errorCount) {
+    $('#stats-errors').html(errorCount);
+}
+
+function updateWPMDisplay(wpm) {
+    $('#stats-wpm').html(wpm);
+}
+
+function getRawWPM(currentWordNum, originalWords, charNumOfWord, timeElapsedMS) {
+    let charsTyped = charNumOfWord;
+    originalWords.some(function(word, index) {
+        if (index == currentWordNum) {
+            return true;
+        } else {
+            charsTyped += word.length + 1;
+            return false;
+        }
+    });
+    return Math.round(charsTyped / 5 * 60 / (timeElapsedMS / 1000));
+}
+
+function getAdjustedWPM() {
+
+}
+
 export default function loadTypingGame() {
+    // Current settings are for word-based detection, 
+    // as opposed to character-based detection
+    let $input = $('#user-input');
+    let $text = $('#text-to-type');
+    $input.prop('disabled', false);
+    
     let text = getText();
 
     // Perform pre-processing on the text data
-    // let totalChars = text.length;
-    let textWords = text.split(' ').filter(function(word) {
+    let textWordsArray = text.split(' ').filter(function(word) {
         return word != ' ' && word != '' && word != '\n' && word != null;
     });
-    let totalWords = textWords.length;
+    let numTotalWords = textWordsArray.length;
     
-    let formattedText = ''
+    let textAsHTML = '';
     let counter = 0;
-    for (let word of textWords) {
-        formattedText += '<span id="' + counter + 'word">' + word + '</span>' + ' ';
+    for (let word of textWordsArray) {
+        textAsHTML += '<span id="' + counter + 'word">' + word + '</span>' + ' ';
         counter++;
     }
-
-    loadTextToType(formattedText);
+    loadTextToType(textAsHTML);
 
     // Prevent copy-and-pasting words, rather than typing them
-    let $input = $('#user-input');
-    let $text = $('#text-to-type');
     $input.on('cut paste', function(e) {
         e.preventDefault();
     });
@@ -68,147 +106,214 @@ export default function loadTypingGame() {
         if (e.which == 38 || e.which == 40) {
             e.preventDefault();
         }
+        // Prevent movement with left and right arrow keys for now
+        if (e.which == 37 || e.which == 39) {
+            e.preventDefault();
+        }
         // TODO: determine if home and end keys should also be disabled
     });
 
-    // Typing Test Logic
-    let currentChar = 0;
-    let currentWordIndex = 0;
-    let typedWords = new Array(totalWords).fill('');
-    // let numErrors = 0;
+    // Variables required for game logic
+    let charNumOfWord = 0;
+    let globalCharNum = 0;
+    let currentWordNum = 0;
+    let typedWords = new Array(numTotalWords).fill('');
+    let wordErrorNum = 0;
+    let timer = null;
+    let startTime = null;
+    let endTime = null;
+    let wpm = 0;
 
-    let timerVar = null;
-    function startCountdownTimer() {
-        let allowedTime = 30000;
-        $('#0word').addClass('currentWord');
-        setTimeout(function() {
-            $('#typing-section').append(`<section class="section">
-                Game over! You typed ${0} words in 
-                15 seconds! (Accuracy not guaranteed)
-            </section>`);
-            $('#user-input').prop('disabled', true);
-        }, allowedTime);
-        $('#user-input').off('keypress', startCountdownTimer);
+    function startCountdownTimer(allowedTime) {
+        setTimeout(triggerGameOver, allowedTime);
+        $input.off('keypress', startTimerHelper);
     
         // Set up timer
         $('#timer').html(`Remaining Time: ${allowedTime / 1000} seconds`);
-        let endTime = new Date().getTime() + allowedTime;
-        timerVar = setInterval(function() {
+        let stopAtTime = new Date().getTime() + allowedTime;
+        timer = setInterval(function() {
             let now = new Date().getTime();
-            let timeLeft = endTime - now;
-            $('#timer').html(`Remaining Time: ${Math.round(timeLeft / 1000)} seconds`);
+            let timeLeft = stopAtTime - now;
+            $('#timer').html(`Remaining Time: 
+                              ${Math.round(timeLeft / 1000)} seconds`);
+            wpm = getRawWPM(currentWordNum, textWordsArray, charNumOfWord, now - startTime);
+            updateWPMDisplay(wpm);
             if (timeLeft < 0) {
-                clearInterval(timerVar);
+                clearInterval(timer);
             }
         }, 1000);
     }
     
-    function startStopwatchTimer() {
+    function startTimerHelper() {
         $('#0word').addClass('currentWord');
+        startTime = new Date().getTime();
+        startCountdownTimer(30000);
+    }
+
+    function triggerGameOver() {
+        endTime = new Date().getTime();
+        createGameOverScreen(globalCharNum, 
+                             wordErrorNum, 
+                             textWordsArray, 
+                             endTime - startTime);
+    }
+
+    /*function startStopwatchTimer() {
         $('#user-input').off('keypress', startStopwatchTimer);
     
         $('#timer').html(`Time Elapsed: 0 seconds`);
-        let startTime = new Date().getTime();
-        timerVar = setInterval(function() {
+        startTime = new Date().getTime();
+        timer = setInterval(function() {
             let now = new Date().getTime();
             let timeElapsed = now - startTime;
             $('#timer').html(`Time Elapsed: 
-                                ${Math.round(timeElapsed / 1000)} seconds`);
+                              ${Math.round(timeElapsed / 1000)} seconds`);
         }, 1000);
-    }
+    }*/
 
-    $input.on('keypress', startCountdownTimer);
+    // Ready the game when someone starts typing
+    $input.on('keypress', startTimerHelper);
 
-    let linesScrolled = 0;
-
-    // Word-based detection, as opposed to character-based detection
+    // Handle typing a character
     $input.on('keypress', function(e) {
-        typedWords[currentWordIndex] += String.fromCharCode(e.which);
-        currentChar++;
+        charNumOfWord++;
+        globalCharNum++;
 
-        let wordID = '#' + currentWordIndex + 'word';
-        if (e.which == 32) { // Handle pressing space, i.e. moving to next word
-            // Handle pressing space if no other letters were typed yet
-            if (currentChar == 0) {
-                return;
-            }
-            
-            if (typedWords[currentWordIndex] 
-                    != textWords[currentWordIndex] + ' ') {
-                $text.find(wordID).removeClass('cword').addClass('icword');
+        let wordID = '#' + currentWordNum + 'word';
+
+        // Handle typing space, which means we move to the next word
+        if (e.which == 32) {
+            // If no characters besides space have been typed,
+            // do not go onto the next word
+            if (typedWords[currentWordNum].replace(/\s+/g, '') == '') {
+                typedWords[currentWordNum] += ' ';
+                $text.find(wordID).addClass('icword');
+                $input.addClass('ictextinput');
+                if (charNumOfWord == 1) {
+                    wordErrorNum++;
+                }
+            } else {
+                // Handle case that previous word was typed incorrectly 
+                // before moving onto the next
+                if (typedWords[currentWordNum] 
+                        != textWordsArray[currentWordNum]) {
+                    $text.find(wordID).removeClass('cword').addClass('icword');
+                    if (typedWords[currentWordNum] 
+                        == textWordsArray[currentWordNum]
+                            .slice(0, typedWords[currentWordNum].length)) {
+                        wordErrorNum++;
+                    }
+                }
+
+                $text.find(wordID).removeClass('currentWord')
+                currentWordNum++;
+                charNumOfWord = 0;
+                $text
+                    .find('#' + currentWordNum + 'word')
+                    .addClass('currentWord');
+                if (currentWordNum == numTotalWords) {
+                    clearInterval(timer);
+                    triggerGameOver();
+                    $('#user-input').prop('disabled', true);
+                }
             }
 
-            $text.find(wordID).removeClass('currentWord')
-            currentWordIndex++;
-            $text.find('#' + currentWordIndex 
-                                + 'word').addClass('currentWord');
-            currentChar = 0;
-            if (currentWordIndex == totalWords) {
-                clearInterval(timerVar);
-                $('#user-input').prop('disabled', true);
-            }
+            updateErrorDisplay(wordErrorNum);
             return;
         }
 
-        if (typedWords[currentWordIndex] 
-                == textWords[currentWordIndex].slice(0, 
-                    typedWords[currentWordIndex].length)) {
+        // Handle typing any other character besides space
+        typedWords[currentWordNum] += String.fromCharCode(e.which);
+
+        if (typedWords[currentWordNum] 
+                == textWordsArray[currentWordNum]
+                    .slice(0, typedWords[currentWordNum].length)) {
             // Correct word typed
             $text.find(wordID).removeClass('icword').addClass('cword');
             $input.removeClass('ictextinput');
         } else {
             // Incorrect word typed
+            if (!$text.find(wordID).hasClass('icword')) {
+                wordErrorNum++;
+            }
             $text.find(wordID).removeClass('cword').addClass('icword');
             $input.addClass('ictextinput');
         }
 
+        updateErrorDisplay(wordErrorNum);
         // TODO: handle pressing enter
     });
     
+    // Handle pressing backspace
     $input.on('keydown', function(e) {
-        if (e.which == 8) { // Backspace
-            // TODO: if the word was incorrect in the first place,
-            // after we've gone back to the previous word,
-            // Show it in the input box
+        if (e.which == 8) { // Backspace pressed
+            charNumOfWord--;
+            globalCharNum--;
 
-            currentChar--;
-            if (currentChar < 0 && currentWordIndex > 0) {
-                $text.find('#' 
-                        + currentWordIndex + 'word').removeClass(`currentWord
-                                                                  icword
-                                                                  cword`);
-                currentWordIndex--;
-                currentChar = typedWords[currentWordIndex].length - 1;
-                $text.find('#' 
-                        + currentWordIndex + 'word').addClass('currentWord');
-            }
-            
-            typedWords[currentWordIndex] = typedWords[currentWordIndex].slice(0, 
-                                        typedWords[currentWordIndex].length - 1);
-            if (typedWords[currentWordIndex] == undefined) {
-                typedWords[currentWordIndex] = '';
+            // Delete a character from what the user typed for the current word
+            typedWords[currentWordNum] = typedWords[currentWordNum].slice(0, 
+                typedWords[currentWordNum].length - 1);
+            if (typedWords[currentWordNum] == undefined) {
+                typedWords[currentWordNum] = '';
             }
 
-            let wordID = '#' + currentWordIndex + 'word';
-            if (typedWords[currentWordIndex] 
-                    == textWords[currentWordIndex].slice(0, 
-                        typedWords[currentWordIndex].length)) {
+            // Handle returning to the previous word we typed
+            if (charNumOfWord < 0) {
+                if (currentWordNum > 0) {
+                    $text.find('#' + currentWordNum + 'word')
+                         .removeClass(`currentWord
+                                       icword
+                                       cword`);
+                    currentWordNum--;
+                    charNumOfWord = typedWords[currentWordNum].length;
+                    $text.find('#' 
+                            + currentWordNum + 'word').addClass('currentWord');
+                } else {
+                    // Reached beginning of text, cannot go back any more
+                    charNumOfWord = 0;
+                }
+            }
+
+            let wordID = '#' + currentWordNum + 'word';
+            if (typedWords[currentWordNum] 
+                    == textWordsArray[currentWordNum].slice(0, 
+                        typedWords[currentWordNum].length)) {
                 // Backspace brought us back to a correct word or word part
+                let wasIncorrect = $text.find(wordID).hasClass('icword');
+                if (wasIncorrect) {
+                    wordErrorNum--;
+                }
+
                 $text.find(wordID).removeClass('icword');
-                if (typedWords[currentWordIndex].length != 0) {
+                if (typedWords[currentWordNum].length != 0) {
                     $text.find(wordID).addClass('cword');
                 }
                 $input.removeClass('ictextinput');
+            } else {
+                // Backspace brought us back to an incorrect word/word part
+                $input.addClass('ictextinput');
             }
         }
+
+        updateErrorDisplay(wordErrorNum);
     });
 
+    // Auto-scroll the text to type.
+    // Accuracy of scrolling is a work-in-progress.
+    let linesScrolled = 0;
+    let lastScrollTop = 0;
     $input.on('scroll', function(e) {
-        linesScrolled++;
-        if (linesScrolled > 3) {
-            console.log('scroll')
-            $text.scrollTop((linesScrolled - 3)*20);
+        let st = $(this).scrollTop();
+        if (st > lastScrollTop) {
+            linesScrolled++;
+            if (linesScrolled > 2) {
+                $text.scrollTop((linesScrolled - 2)*20);
+            }
+        } else if (st < lastScrollTop) {
+            linesScrolled--;
+            $text.scrollTop((linesScrolled - 2)*20);
         }
+        lastScrollTop = st;
     });
 
     // Unfinished attempt at character-based detection,
@@ -217,10 +322,10 @@ export default function loadTypingGame() {
     /*
     let typedChars = 0;
     $input.on('keypress', function(e) {
-        if (text.charCodeAt(currentChar) == e.which) {
+        if (text.charCodeAt(charNumOfWord) == e.which) {
             $('body').append('<span style="color: red">good!</span>');
         }
-        currentChar++;
+        charNumOfWord++;
         typedChars++;
         $('.text-to-type').replaceWith(displayText.slice());
         if (typedChars == totalChars) {
@@ -230,8 +335,8 @@ export default function loadTypingGame() {
     
     $input.on('keydown', function(e) {
         if (e.which == 8) { // Backspace
-            if (currentChar > 0) {
-                currentChar--;
+            if (charNumOfWord > 0) {
+                charNumOfWord--;
                 typedChars--;
             }
         }
