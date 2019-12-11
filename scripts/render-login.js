@@ -1,16 +1,13 @@
 import config from "../config.js";
-import Lobby from "../scripts/lobbies.js"
-
+import Lobby from "../scripts/lobbies.js";
 
 let url = config.url;
-
-let lobbies = [];
 
 /**
  * Adds event listener to login button
  */
 function installLoginButton() {
-  $("#login-button").on("click", function () {
+  $("#login-button").on("click", function() {
     createUserActionPrompt("Login");
   });
 }
@@ -19,115 +16,58 @@ function installLoginButton() {
  * Adds event listener to signup button
  */
 function installSignupButton() {
-  $("#signup-button").on("click", function () {
+  $("#signup-button").on("click", function() {
     createUserActionPrompt("Sign Up");
   });
 }
 
-function installLobbyButton() {
-  $("#lobby-button").on("click", function () {
-    createLobbyList();
-  })
-}
-
-async function createDefaultLobbies() {
-  let defaultLobby = new Lobby("Default");
-  lobbies.push(defaultLobby);
-
-  try {
-    axios.post( url + "/public/Lobbies/", {
-      data: {
-          name: lobbies[0].name,
-          pass: lobbies[0].passcode,
-          users: lobbies[0].users,
-          hasPasscode: lobbies[0].hasPasscode,
-      }
-    })
-    .then(response => { 
-      console.log(lobbies[0].name);
-      console.log(response)
-    })
-    .catch(error => {
-        console.log(error.response)
-    });
-    // let result = await axios({
-    //   method: "post",
-    //   url: url + "/public/Lobbies",
-    //   data: {
-    //     name: lobbies[0].name,
-    //     pass: lobbies[0].passcode,
-    //     users: lobbies[0].users,
-    //     hasPasscode: lobbies[0].hasPasscode,
-    //   }
-    // });
-    //window.localStorage.setItem('jwt', result.data['jwt']);
-    //window.localStorage.setItem('Default Lobby Name', result.data['name']);
-    //location.reload();
-  } catch {
-    $("#uap-header").html(`
-                <span class="has-text-danger">Login failed! Try again!</span>
-            `);
-  }
-}//);
-//}
-
 /**
  * Adds event handlers to login and signup buttons
- * @param {*} mode 
+ * @param {string} mode
  */
 function installPromptButtonHandlers(mode) {
   if (mode == "Login") {
-    $("#submit-user-action").on("click", async function () {
-      try {
-        let result = await axios({
-          method: "post",
-          url: url + "/account/login",
-          data: {
-            name: $("#username").val(),
-            pass: $("#password").val()
-          }
-        });
-        window.localStorage.setItem('jwt', result.data['jwt']);
-        window.localStorage.setItem('typing-username', result.data['name']);
-        location.reload();
-      } catch {
-        $("#uap-header").html(`
-                    <span class="has-text-danger">Login failed! Try again!</span>
-                `);
-      }
+    // Log in event handler
+    $("#submit-user-action").on("click", async function() {
+      // Get user credentials
+      let username = $("#username").val();
+      let password = $("#password").val();
+
+      // Log user in with provided credentials
+      logUserIn(username, password);
     });
   } else if (mode == "Sign Up") {
-    $("#submit-user-action").on("click", async function () {
-      try {
-        let result = await axios({
-          method: "post",
-          url: url + "/account/create",
-          data: {
-            name: $("#username").val(),
-            pass: $("#password").val()
-          }
-        });
-        $("#user-action-prompt-background").find('.field').remove();
-        $('#uap-header').html('Signup successful! Please close this '
-          + 'panel and log in!');
-        $('#submit-user-action').remove();
-        $('#cancel-user-action').html('Close');
-      } catch {
-        $("#uap-header").html(`
+    // Sign up event handler
+    $("#submit-user-action").on("click", async function() {
+      // Get user credentials
+      let username = $("#username").val();
+      let password = $("#password").val();
+
+      // Sign user up with provided credentials
+      signUserUp(username, password)
+        .then(response => {
+          console.log("Signed up successfully!");
+
+          // Log user in for the first time after signing them up
+          logUserInFirstTime(username, password);
+        })
+        .catch(error => {
+          $("#uap-header").html(`
                     <span class="has-text-danger">Sign-up failed! Try again!</span>
                 `);
-      }
+        });
     });
   }
 
-  $("#cancel-user-action").on("click", function () {
+  // Removes the log in prompt if user clicks cancel/close
+  $("#cancel-user-action").on("click", function() {
     $("#user-action-prompt-background").remove();
   });
 }
 
 /**
  * Creates a prompt for the login and signup popup
- * @param {*} mode 
+ * @param {string} mode
  */
 function createUserActionPrompt(mode) {
   let $prompt = $(`
@@ -166,72 +106,104 @@ function createUserActionPrompt(mode) {
   installPromptButtonHandlers(mode);
 }
 
-function createLobbyList() {
-  $('#lobby-button').on('click', async function () {
-    async function getLobbies() {
-      try {
-        let result = await axios({
-          method: 'get',
-          url: url + '/public/Lobbies',
-        });
-        console.log(result.data);
-        console.log("GAYYYYYYY");
-        return result.data;
+/**
+ * Creates a default user profile
+ */
+async function createPublicUserProfile(displayName) {
+  await axios({
+    method: "post",
+    url: url + "/user/profile/",
+    headers: { Authorization: "Bearer " + localStorage.jwt },
+    data: {
+      data: {
+        displayName: displayName,
+        gamesPlayed: 0,
+        avgWPM: 0,
+        highestWPM: 0
       }
-      catch (e) {
-        // If user does not have settings configured,
-        // configure it first
-        return e;
-      }
-
     }
+  }).then(response => {
+    console.log(response);
+  }).catch(error => {
+    console.log(error.response);
+  });
+}
 
-    try {
-      let lobbies = await getLobbies();
-      console.log(lobbies.result.name);
-      $('body').append(`
-                <div class="prompt-background" id="lobbies-prompt-background">
-                    <div class="menu-prompt">
-                        <p class="has-text-centered is-size-3">
-                            Lobbies:
-                        </p>
-                        <br>
+/**
+ * Logs user in using an axios post call.
+ * @param {string} username
+ * @param {string} password
+ */
+async function logUserIn(username, password) {
+  await axios({
+    method: "post",
+    url: url + "/account/login",
+    data: {
+      name: username,
+      pass: password
+    }
+  }).then(response => {
+    // After logging in successfully, set the jwt (local log in cache) values
+    window.localStorage.setItem("jwt", response.data["jwt"]);
+    window.localStorage.setItem("typing-username", response.data["name"]);
 
-                        <div>
-                            <span class="has-text-gray">${lobbies.result.name}</span>
-                        </div>
-                        
-                        <br>
-                        <button class="button is-warning" id="close-prompt">Close</button>
-                    </div>
-                </div>
-            `);
-      $('#close-prompt').on('click', function () {
-        $('#lobbies-prompt-background').remove();
-      });
-    } catch {
-      $('body').append(`
-                <div class="prompt-background" id="error-prompt-background">
-                    <div class="user-prompt">
-                        <p class="has-text-centered is-size-4" id="uap-header">
-                            Uh oh! Looks like an error occurred. Please try logging 
-                            out and logging back in!
-                        </p>
-                        <br>
-                        <button class="button is-warning" id="close-prompt">Close</button>
-                    </div>
-                </div>
-            `);
-      $('#close-prompt').on('click', function () {
-        $('#error-prompt-background').remove();
-      });
+    // Reload to show the user is logged in
+    location.reload();
+  })
+  .catch(error => {
+    // If the user enters invalid credentials, display a message
+    console.log(error);
+    $("#uap-header").html(`
+              <span class="has-text-danger">Login failed! Try again!</span>
+          `);
+  });
+}
+
+/**
+ * Logs user in for the very first time, this is different from a regular log in because it initializes the user's profile.
+ * @param {string} username 
+ * @param {string} password 
+ */
+async function logUserInFirstTime(username, password) {
+  await axios({
+    method: "post",
+    url: url + "/account/login",
+    data: {
+      name: username,
+      pass: password
+    }
+  }).then(response => {
+    // After logging in successfully, set the jwt (local log in cache) values
+    window.localStorage.setItem("jwt", response.data["jwt"]);
+    window.localStorage.setItem("typing-username", response.data["name"]);
+
+    // Creating the user's default profile when they first log in
+    createPublicUserProfile(username);
+
+    // Reload to show the user is logged in
+    location.reload();
+  }).catch(error => {
+    console.log(error.response);
+  });
+}
+
+/**
+ * Signs user up using an axios post call.
+ * @param {string} username
+ * @param {string} password
+ */
+async function signUserUp(username, password) {
+  return await axios({
+    method: "post",
+    url: url + "/account/create",
+    data: {
+      name: username,
+      pass: password
     }
   });
 }
 
 export default function installButtonsNotLoggedIn() {
-  createDefaultLobbies();
   installLoginButton();
   installSignupButton();
-  installLobbyButton();
 }
