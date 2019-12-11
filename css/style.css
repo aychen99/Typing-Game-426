@@ -222,7 +222,7 @@ body {
   font-weight: bold;
 } */
 
-#timer, #typing-stats-section {
+#timer, #typing-stats-section, #results, #save-results-message {
   margin-top: 8px;
   width: 500px;
   margin: auto;

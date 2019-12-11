@@ -88,7 +88,7 @@ function renderTypingSectionTimer() {
       has-background-info 
       has-text-white 
       has-text-weight-bold" 
-    id="timer">Time Elapsed: 0:00</p>
+    id="timer">Type inside the input box to begin!</p>
   `;
 }
 
