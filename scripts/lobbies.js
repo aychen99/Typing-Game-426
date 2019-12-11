@@ -4,17 +4,17 @@ let url = config.url;
 
 //A lobby class
 export default class Lobby {
-    constructor (name) {
-        this.name = name;
-        this.users = [];
-        this.hasPasscode = false;
-        this.passcode = "";
-        this.owner = "";
-    }
+  constructor(name) {
+    this.name = name;
+    this.users = [];
+    this.hasPasscode = false;
+    this.passcode = "";
+    this.owner = "";
+  }
 
-    join(name) {
-        users.push(name);
-    }
+  join(name) {
+    users.push(name);
+  }
 }
 
 export function installLobbyButton() {
@@ -22,30 +22,26 @@ export function installLobbyButton() {
     createLobbyList();
   })
 }
-  async function getLobbies() {
-    try {
-      let result = await axios({
-        method: 'get',
-        url: url + '/public/Lobbies',
-      })
-      // .then(response => {
-      //   console.log(response)
-      // });
-      console.log(result)
-      return result.data.result;
-    }
-    catch (e) {
-      // Returns error if there is one
-      console.log(e);
-    }
-
+async function getLobbies() {
+  try {
+    let result = await axios({
+      method: 'get',
+      url: url + '/public/Lobbies',
+    })
+    return result.data.result;
+  }
+  catch (e) {
+    // Returns error if there is one
+    console.log(e);
   }
 
-  async function createLobbyList() {
-      try {
-        let lobbies = await getLobbies();
-        let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
-        $('body').append(`
+}
+
+async function createLobbyList() {
+  try {
+    let lobbies = await getLobbies();
+    let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+    $('body').append(`
                   <div class="prompt-background" id="lobbies-prompt-background">
                       <div class="menu-prompt">
                           <p class="has-text-centered is-size-3">
@@ -63,40 +59,58 @@ export function installLobbyButton() {
                       </div>
                   </div>
               `);
-        $('#close-prompt').on('click', function (e) {
-          $('#lobbies-prompt-background').remove();
+    $('#close-prompt').on('click', function (e) {
+      $('#lobbies-prompt-background').remove();
+      e.preventDefault();
+    })
+    $('#create-prompt').on('click', async function (e) {
+      if (await findLobby() == false) {
+        createALobby();
+        e.preventDefault();
+      } else {
+        $('body').append(`
+            <div class="prompt-background" id="error-mini-prompt-background">
+                <div class="user-prompt">
+                    <p class="has-text-centered is-size-4" id="uap-header">
+                      Seems like you have already created a Lobby. You can only have one owned lobby at a time.
+                    </p>
+                    <br>
+                    <button class="button is-warning" id="close-mini-prompt">Close</button>
+                </div>
+            </div>
+        `);
+        $('#close-mini-prompt').on('click', function (e) {
+          $('#error-mini-prompt-background').remove();
           e.preventDefault();
-        })
-        $('#create-prompt').on('click', function (e) {
-          createALobby();
-          e.preventDefault();
-        })
-        $('#delete-prompt').on('click', async function (e) {
-          await deleteLobby();
-          $('#lobbies-prompt-background').remove();
-          createLobbyList();
-          e.preventDefault();
-       });
-      } catch (e) {
-        console.log(e);
+        });
       }
+    })
+    $('#delete-prompt').on('click', async function (e) {
+      await deleteLobby();
+      $('#lobbies-prompt-background').remove();
+      createLobbyList();
+      e.preventDefault();
+    });
+  } catch (e) {
+    console.log(e);
   }
+}
 
-  
-  function showLobbies(array) {
-    let hold = "";
-    for (let i = array.length - 1; i >= 0; i--) {
-      hold = 
+
+function showLobbies(array) {
+  let hold = "";
+  for (let i = array.length - 1; i >= 0; i--) {
+    hold =
       `<div>
         <span class="has-text-gray"><a href = "#" onclick="return false;">${array[i].name + " " + array[i].owner} </span>
       </div>` + hold
-    }
-    return hold;
   }
-  
-  function createALobby() {
-    if (localStorage.jwt) {
-             $('body').append(`
+  return hold;
+}
+
+function createALobby() {
+  if (localStorage.jwt) {
+    $('body').append(`
                   <div class="prompt-background" id="create-mini-prompt-background">
                       <div class="user-prompt">
                         <form>
@@ -115,18 +129,18 @@ export function installLobbyButton() {
                       </div>
                   </div>
               `);
-        $('#close-mini-prompt').on('click', function (e) {
-            $('#create-mini-prompt-background').remove();
-            e.preventDefault();
-        })
-        $('#create-mini-prompt').on('click', async function() {
-            await createLobby();
-            $('#create-mini-prompt-background').remove();
-            $('#lobbies-prompt-background').remove();
-            createLobbyList();  
-        });
-    } else {
-       $('body').append(`
+    $('#close-mini-prompt').on('click', function (e) {
+      $('#create-mini-prompt-background').remove();
+      e.preventDefault();
+    })
+    $('#create-mini-prompt').on('click', async function () {
+      await createLobby();
+      $('#create-mini-prompt-background').remove();
+      $('#lobbies-prompt-background').remove();
+      createLobbyList();
+    });
+  } else {
+    $('body').append(`
                   <div class="prompt-background" id="error-mini-prompt-background">
                       <div class="user-prompt">
                           <p class="has-text-centered is-size-4" id="uap-header">
@@ -137,55 +151,63 @@ export function installLobbyButton() {
                       </div>
                   </div>
               `);
-        $('#close-mini-prompt').on('click', function (e) {
-          $('#error-mini-prompt-background').remove();
-          e.preventDefault();
-        });
-    }
-
+    $('#close-mini-prompt').on('click', function (e) {
+      $('#error-mini-prompt-background').remove();
+      e.preventDefault();
+    });
   }
 
-  async function createLobby() {
-        let hold = $("#lobby-name").val();
-        let hasP = false;
+}
 
-        if(!($("#lobby-passcode") == "")) {
-            hasP = true;
-        }
+async function createLobby() {
+  let hold = $("#lobby-name").val();
+  let hasP = false;
 
-
-        await axios.post( url + `/public/Lobbies/${hold}`, {
-            data: {
-                name : hold,
-                users : [],
-                hasPasscode : hasP,
-                passcode : $("#lobby-passcode").val(),
-                owner : localStorage['typing-username'], 
-            }
-          })
-          .catch(error => {
-            console.log(error.response)
-          });
-      }
-
-
-
-
-  async function deleteLobby() {
-    let thisURL;
-    let lobbies = await getLobbies();
-    let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
-    for (let i = 0; i < lobbyArray.length; i++) {
-      if (lobbyArray[i].owner == localStorage['typing-username']) {
-        try {
-          thisURL = url + `/public/Lobbies/${lobbyArray[i].name}`;
-          console.log(thisURL);
-          await axios.delete(thisURL);
-
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    }
-    return false;
+  if (!($("#lobby-passcode") == "")) {
+    hasP = true;
   }
+
+  await axios.post(url + `/public/Lobbies/${hold}`, {
+    data: {
+      name: hold,
+      users: [],
+      hasPasscode: hasP,
+      passcode: $("#lobby-passcode").val(),
+      owner: localStorage['typing-username'],
+    }
+  })
+    .catch(error => {
+      console.log(error.response)
+    });
+}
+
+
+async function findLobby() {
+  let lobbies = await getLobbies();
+  let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+  for (let i = 0; i < lobbyArray.length; i++) {
+    if (lobbyArray[i].owner == localStorage['typing-username']) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function deleteLobby() {
+  let thisURL;
+  let lobbies = await getLobbies();
+  let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+  for (let i = 0; i < lobbyArray.length; i++) {
+    if (lobbyArray[i].owner == localStorage['typing-username']) {
+      try {
+        thisURL = url + `/public/Lobbies/${lobbyArray[i].name}`;
+        await axios.delete(thisURL);
+
+      } catch (e) {
+        console.log(e);
+      }
+      return true;
+    }
+  }
+  return false;
+}
