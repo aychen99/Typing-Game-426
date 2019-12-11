@@ -3,12 +3,13 @@ import config from "../config.js";
 let url = config.url;
 
 //A lobby class
-export class Lobby {
+export default class Lobby {
     constructor (name) {
         this.name = name;
         this.users = [];
         this.hasPasscode = false;
         this.passcode = "";
+        this.owner = "";
     }
 
     join(name) {
@@ -16,18 +17,18 @@ export class Lobby {
     }
 }
 
-export default function installLobbyButton() {
-    $("#lobby-button").on("click", function () {
-      createLobbyList();
-    })
-  }
-
+export function installLobbyButton() {
+  $("#lobby-button").on("click", function () {
+    createLobbyList();
+  })
+}
   async function getLobbies() {
     try {
       let result = await axios({
         method: 'get',
         url: url + '/public/Lobbies',
       });
+
       return result.data.result;
     }
     catch (e) {
@@ -40,6 +41,7 @@ export default function installLobbyButton() {
   async function createLobbyList() {
       try {
         let lobbies = await getLobbies();
+        console.log(lobbies)
         let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
         //console.log(lobbyArray);
         $('body').append(`
@@ -55,6 +57,8 @@ export default function installLobbyButton() {
   
                           <button class="button is-warning" id="close-prompt">Close</button>
                           <button class="button is-info" id="create-prompt">Create</button>
+                          <button class="button is-danger" id="delete-prompt">Delete Lobby</button>
+
                       </div>
                   </div>
               `);
@@ -65,7 +69,11 @@ export default function installLobbyButton() {
         $('#create-prompt').on('click', function (e) {
           createALobby();
           e.preventDefault();
-        });
+        })
+        // $('#delete-prompt').on('click', function (e) {
+        //   deleteLobby();
+        //   e.preventDefault();
+       // });
       } catch (e) {
         console.log(e);
       }
@@ -77,7 +85,7 @@ export default function installLobbyButton() {
     for (let i = array.length - 1; i >= 0; i--) {
       hold = 
       `<div>
-        <span class="has-text-gray"><a href = "#" onclick="return false;">${array[i].name}</span>
+        <span class="has-text-gray"><a href = "#" onclick="return false;">${array[i].name + " " + array[i].owner} </span>
       </div>` + hold
     }
     return hold;
@@ -148,10 +156,12 @@ export default function installLobbyButton() {
                 name : hold,
                 users : [],
                 hasPasscode : hasP,
-                passcode : $("#lobby-passcode").val() 
+                passcode : $("#lobby-passcode").val(),
+                owner : localStorage['typing-username'], 
             }
           })
           .then(response => { 
+            console.log($(localStorage['typing-username']))
             console.log(response)
           })
           .catch(error => {
@@ -161,3 +171,22 @@ export default function installLobbyButton() {
         console.log(e)
       }
   }
+
+
+
+  // async function deleteLobby() {
+  //   let lobbies = await getLobbies();
+  //   let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+  //   //console.log(lobbyArray)
+  //   for (let i = 0; i < lobbyArray.length; i++) {
+  //     if (lobbyArray[i].owner == localStorage['typing-username']) {
+  //       try {
+  //         url = url + `/public/Lobbies/`;
+  //         axios.delete(url);
+  //       } catch (e) {
+  //         console.log(e);
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }

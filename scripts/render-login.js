@@ -1,11 +1,11 @@
 import config from "../config.js";
-import installLobbyButton from "./lobbies.js";
+import Lobby from "./lobbies.js"
+import { installLobbyButton } from "./lobbies.js";
 
 
 let url = config.url;
 
-async function createDefaultLobbies() {
-  try {
+function createDefaultLobbies() {
   axios.post( url + "/public/Lobbies/", {
     data: {
         Default : new Lobby("Default"),
@@ -14,15 +14,13 @@ async function createDefaultLobbies() {
         Expert : new Lobby("Experts"),
     }
   })
+  .then(response => {
+    console.log(response)
+  })
   .catch(error => {
     console.log(error.response)
   });
-} catch {
-  $("#uap-header").html(`
-              <span class="has-text-danger">Login failed! Try again!</span>
-          `);
-}
-}
+} 
 
 createDefaultLobbies();
 
