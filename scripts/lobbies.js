@@ -33,9 +33,6 @@ async function createDefaultLobbies() {
             Expert : new Lobby("Experts"),
         }
       })
-      .then(response => { 
-        console.log(response)
-      })
       .catch(error => {
         console.log(error.response)
       });
@@ -65,6 +62,7 @@ async function createDefaultLobbies() {
       try {
         let lobbies = await getLobbies();
         let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+        //console.log(lobbyArray);
         $('body').append(`
                   <div class="prompt-background" id="lobbies-prompt-background">
                       <div class="menu-prompt">
@@ -91,31 +89,16 @@ async function createDefaultLobbies() {
         });
       } catch (e) {
         console.log(e);
-        // $('body').append(`
-        //           <div class="prompt-background" id="error-prompt-background">
-        //               <div class="user-prompt">
-        //                   <p class="has-text-centered is-size-4" id="uap-header">
-        //                       Uh oh! Looks like an error occurred. Please try logging 
-        //                       out and logging back in!
-        //                   </p>
-        //                   <br>
-        //                   <button class="button is-warning" id="close-prompt">Close</button>
-        //               </div>
-        //           </div>
-        //       `);
-        // $('#close-prompt').on('click', function () {
-        //   $('#error-prompt-background').remove();
-        // });
       }
   }
 
   
   function showLobbies(array) {
     let hold = "";
-    for (let i = 0; i < array.length; i++) {
+    for (let i = array.length - 1; i >= 0; i--) {
       hold = 
       `<div>
-        <span class="has-text-gray"><a href>${array[i].name}</span>
+        <span class="has-text-gray"><a href = "#" onclick="return false;">${array[i].name}</span>
       </div>` + hold
     }
     return hold;
@@ -124,7 +107,7 @@ async function createDefaultLobbies() {
   function createALobby() {
     if (localStorage.jwt) {
              $('body').append(`
-                  <div class="prompt-background" id="error-mini-prompt-background">
+                  <div class="prompt-background" id="create-mini-prompt-background">
                       <div class="user-prompt">
                         <form>
                             Name: 
@@ -146,11 +129,11 @@ async function createDefaultLobbies() {
             $('#error-mini-prompt-background').remove();
             e.preventDefault();
         })
-        $('#create-mini-prompt').on('click', function(e) {
-            createLobby();
-            $('#error-mini-prompt-background').remove();
-            //$('#lobbies-prompt-background').load(document.URL +  ' #lobbies-prompt-background');
-            e.preventDefault();
+        $('#create-mini-prompt').on('click', async function() {
+            await createLobby();
+            $('#create-mini-prompt-background').remove();
+            $('#lobbies-prompt-background').remove();
+            createLobbyList();  
         });
     } else {
        $('body').append(`
@@ -181,7 +164,7 @@ async function createDefaultLobbies() {
         }
 
       try {
-        axios.post( url + `/public/Lobbies/${hold}`, {
+        await axios.post( url + `/public/Lobbies/${hold}`, {
             data: {
                 name : hold,
                 users : [],
