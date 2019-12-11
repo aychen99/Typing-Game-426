@@ -1,105 +1,173 @@
+<<<<<<< HEAD
 import config from "../config.js"
 import { installLobbyButton } from "./lobbies.js";
+=======
+import config from "../config.js";
+>>>>>>> 653e389714e435cc8d67811a605cf6506aaa7d9e
 
 let url = config.url;
 
+// async function loadUserProfile() {
+//   return await axios({
+//     method: "get",
+//     url: url + "/user/profile/",
+//     headers: { Authorization: "Bearer " + localStorage.jwt }
+//   });
+// }
+
+async function loadUserProfile(field) {
+  return await axios({
+    method: "get",
+    url: url + "/user/profile/" + field,
+    headers: { Authorization: "Bearer " + localStorage.jwt }
+  });
+}
+
+// loadUserProfile().then(response => {
+//   console.log(response);
+// })
+
 function installLogoutButton() {
-    $('#logout-button').on('click', function () {
-        localStorage.removeItem('jwt');
-        localStorage.removeItem('typing-username');
-        location.reload();
-    });
+  $("#logout-button").on("click", function() {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("typing-username");
+    location.reload();
+  });
 }
 
 function installSettingsButton() {
-    $('#settings-button').on('click', async function () {
-        async function getUserSettings() {
-            try {
-                let result = await axios({
-                    method: 'get',
-                    url: url + '/user/settings',
-                    headers: {'Authorization': 'Bearer ' + localStorage.jwt},
-                });
-                return result.data.result;
-            }
-            catch (e) {
-                // If user does not have settings configured,
-                // configure it first
-                await axios({
-                    method: 'post',
-                    url: url + '/user/settings/',
-                    headers: {'Authorization': 'Bearer ' + localStorage.jwt},
-                    data: {
-                        data: {
-                            games_played: '0',
-                            wpm: '0',
-                            theme: 'dark'
-                        }
-                    }
-                });
-                let result = await axios({
-                    method: 'get',
-                    url: url + '/user/settings',
-                    headers: {'Authorization': 'Bearer ' + localStorage.jwt},
-                });
-                return result.data.result;
-            }
-            
-        }
+  $("#settings-button").on("click", async function() {
+    loadUserProfile("displayName").then(response => {
+      let profile = response.data.result;
+      console.log(profile);
+      $("body").append(`
+              <div class="prompt-background" id="settings-prompt-background">
+                  <div class="menu-prompt">
+                      <p class="has-text-centered is-size-3">
+                          Settings for <span class="has-text-info">${localStorage["typing-username"]}</span>:
+                      </p>
+                      <br>
+                      <div>
+                          <span class="has-text-weight-bold">Games Played: </span>
+                          <span class="has-text-gray">${profile["gamesPlayed"]}</span>
+                      </div>
+                      <div>
+                          <span class="has-text-weight-bold">Words Per Minute: </span>
+                          <span class="has-text-gray">${profile["avgWPM"]}</span>
+                      </div>
+                      <div>
+                          <span class="has-text-weight-bold">Theme: </span>
+                          <span class="has-text-gray">${profile["theme"]}</span>
+                      </div>
 
-        try {
-            let settings = await getUserSettings();
-
-            $('body').append(`
-                <div class="prompt-background" id="settings-prompt-background">
-                    <div class="menu-prompt">
-                        <p class="has-text-centered is-size-3">
-                            Settings for <span class="has-text-info">${localStorage['typing-username']}</span>:
-                        </p>
-                        <br>
-                        <div>
-                            <span class="has-text-weight-bold">Games Played: </span>
-                            <span class="has-text-gray">${settings['games_played']}</span>
-                        </div>
-                        <div>
-                            <span class="has-text-weight-bold">Words Per Minute: </span>
-                            <span class="has-text-gray">${settings['wpm']}</span>
-                        </div>
-                        <div>
-                            <span class="has-text-weight-bold">Theme: </span>
-                            <span class="has-text-gray">${settings['theme']}</span>
-                        </div>
-
-                        <br>
-                        <button class="button is-warning" id="close-prompt">Close</button>
-                    </div>
-                </div>
-            `);
-            $('#close-prompt').on('click', function() {
-                $('#settings-prompt-background').remove();
-            });
-        } catch {
-            $('body').append(`
-                <div class="prompt-background" id="error-prompt-background">
-                    <div class="user-prompt">
-                        <p class="has-text-centered is-size-4" id="uap-header">
-                            Uh oh! Looks like an error occurred. Please try logging 
-                            out and logging back in!
-                        </p>
-                        <br>
-                        <button class="button is-warning" id="close-prompt">Close</button>
-                    </div>
-                </div>
-            `);
-            $('#close-prompt').on('click', function() {
-                $('#error-prompt-background').remove();
-            });
-        }
+                      <br>
+                      <button class="button is-warning" id="close-prompt">Close</button>
+                  </div>
+              </div>
+          `);
     });
+
+
+
+
+
+
+
+    // async function getUserSettings() {
+    //   try {
+    //     let result = await axios({
+    //       method: "get",
+    //       url: url + "/user/settings",
+    //       headers: {
+    //         Authorization: "Bearer " + localStorage.jwt
+    //       }
+    //     });
+
+    //     return result.data.result;
+    //   } catch (e) {
+    //     // If user does not have settings configured,
+    //     // configure it first
+    //     await axios({
+    //       method: "post",
+    //       url: url + "/user/settings/",
+    //       headers: { Authorization: "Bearer " + localStorage.jwt },
+    //       data: {
+    //         data: {
+    //           games_played: "0",
+    //           wpm: "0",
+    //           theme: "dark"
+    //         }
+    //       }
+    //     });
+    //     let result = await axios({
+    //       method: "get",
+    //       url: url + "/user/settings",
+    //       headers: { Authorization: "Bearer " + localStorage.jwt }
+    //     });
+    //     return result.data.result;
+    //   }
+    // }
+
+    // try {
+      
+
+      // $("body").append(`
+      //           <div class="prompt-background" id="settings-prompt-background">
+      //               <div class="menu-prompt">
+      //                   <p class="has-text-centered is-size-3">
+      //                       Settings for <span class="has-text-info">${localStorage["typing-username"]}</span>:
+      //                   </p>
+      //                   <br>
+      //                   <div>
+      //                       <span class="has-text-weight-bold">Games Played: </span>
+      //                       <span class="has-text-gray">${settings["games_played"]}</span>
+      //                   </div>
+      //                   <div>
+      //                       <span class="has-text-weight-bold">Words Per Minute: </span>
+      //                       <span class="has-text-gray">${settings["wpm"]}</span>
+      //                   </div>
+      //                   <div>
+      //                       <span class="has-text-weight-bold">Theme: </span>
+      //                       <span class="has-text-gray">${settings["theme"]}</span>
+      //                   </div>
+
+      //                   <br>
+      //                   <button class="button is-warning" id="close-prompt">Close</button>
+      //               </div>
+      //           </div>
+      //       `);
+      
+  //     $("#close-prompt").on("click", function() {
+  //       $("#settings-prompt-background").remove();
+  //     });
+  //   } catch {
+  //     $("body").append(`
+  //               <div class="prompt-background" id="error-prompt-background">
+  //                   <div class="user-prompt">
+  //                       <p class="has-text-centered is-size-4" id="uap-header">
+  //                           Uh oh! Looks like an error occurred. Please try logging 
+  //                           out and logging back in!
+  //                       </p>
+  //                       <br>
+  //                       <button class="button is-warning" id="close-prompt">Close</button>
+  //                   </div>
+  //               </div>
+  //           `);
+  //     $("#close-prompt").on("click", function() {
+  //       $("#error-prompt-background").remove();
+  //     });
+  //   }
+  });
 }
 
 export default function installButtonsLoggedIn() {
+<<<<<<< HEAD
     installLogoutButton();
     installSettingsButton();
     installLobbyButton();
 }
+=======
+  installLogoutButton();
+  installSettingsButton();
+}
+>>>>>>> 653e389714e435cc8d67811a605cf6506aaa7d9e
