@@ -11,6 +11,7 @@ function setupView() {
   $root.append(renderTypingSectionTextContainer());
   $root.append(renderTypingSectionInputBox());
   $root.append(renderTypingSectionTimer());
+  $root.append(renderTypingStats());
   $("#typing-section-text-container").append(renderTextToType());
 
   loadTypingGame();
@@ -92,7 +93,22 @@ function renderTypingSectionTimer() {
 }
 
 function renderTypingStats() {
-  
+  return `
+    <div id="typing-stats-section">
+      <p 
+        class="has-background-success 
+                has-text-white 
+                has-text-weight-bold">
+      Raw WPM: <span id="stats-wpm">0</span>
+      </p>
+      <p
+        class="has-background-success 
+                has-text-white 
+                has-text-weight-bold">
+      Errors: <span id="stats-errors">0</span>
+      </p>
+    </div>
+  `;
 }
 
 $(function() {
