@@ -24,15 +24,13 @@ function installLobbyButton() {
   }
 
 async function createDefaultLobbies() {
-    let defaultLobby = new Lobby("Default");
-  
-    try {
+      try {
       axios.post( url + "/public/Lobbies/", {
         data: {
-            Default: defaultLobby,
-            Beginners: new Lobby("Beginners"),
-            Average: new Lobby("Average"),
-            Experts: new Lobby("Experts"),
+            Default : new Lobby("Default"),
+            Beginner : new Lobby("Beginners"),
+            Average : new Lobby("Average"),
+            Expert : new Lobby("Experts"),
         }
       })
       .then(response => { 
@@ -83,11 +81,13 @@ async function createDefaultLobbies() {
                       </div>
                   </div>
               `);
-        $('#close-prompt').on('click', function () {
+        $('#close-prompt').on('click', function (e) {
           $('#lobbies-prompt-background').remove();
+          e.preventDefault();
         })
-        $('#create-prompt').on('click', function () {
+        $('#create-prompt').on('click', function (e) {
           createALobby();
+          e.preventDefault();
         });
       } catch (e) {
         console.log(e);
@@ -115,7 +115,7 @@ async function createDefaultLobbies() {
     for (let i = 0; i < array.length; i++) {
       hold = 
       `<div>
-        <span class="has-text-gray"><a href = "index.html">${array[i].name}</span>
+        <span class="has-text-gray"><a href>${array[i].name}</span>
       </div>` + hold
     }
     return hold;
@@ -123,19 +123,35 @@ async function createDefaultLobbies() {
   
   function createALobby() {
     if (localStorage.jwt) {
-      $('body').append(`
-        <div> 
-          <form>
-            Name: <br>
-            <input type="text">
-        </div>
-      
-      
-      
-      
-      
-      
-      `);
+             $('body').append(`
+                  <div class="prompt-background" id="error-mini-prompt-background">
+                      <div class="user-prompt">
+                        <form>
+                            Name: 
+                            <input type="text" id="lobby-name">
+                            <br>
+
+                            Passcode:
+                            <input type="text" id="lobby-passcode">
+                            <br>
+
+                        </form>
+                          <br>
+                          <button class="button is-warning" id="close-mini-prompt">Close</button>
+                          <button class="button is-info" id="create-mini-prompt">Create</button>
+                      </div>
+                  </div>
+              `);
+        $('#close-mini-prompt').on('click', function (e) {
+            $('#error-mini-prompt-background').remove();
+            e.preventDefault();
+        })
+        $('#create-mini-prompt').on('click', function(e) {
+            createLobby();
+            $('#error-mini-prompt-background').remove();
+            //$('#lobbies-prompt-background').load(document.URL +  ' #lobbies-prompt-background');
+            e.preventDefault();
+        });
     } else {
        $('body').append(`
                   <div class="prompt-background" id="error-mini-prompt-background">
@@ -148,11 +164,40 @@ async function createDefaultLobbies() {
                       </div>
                   </div>
               `);
-        $('#close-mini-prompt').on('click', function () {
+        $('#close-mini-prompt').on('click', function (e) {
           $('#error-mini-prompt-background').remove();
+          e.preventDefault();
         });
     }
 
+  }
+
+  async function createLobby() {
+        let hold = $("#lobby-name").val();
+        let hasP = false;
+
+        if(!($("#lobby-passcode") == "")) {
+            hasP = true;
+        }
+
+      try {
+        axios.post( url + `/public/Lobbies/${hold}`, {
+            data: {
+                name : hold,
+                users : [],
+                hasPasscode : hasP,
+                passcode : $("#lobby-passcode").val() 
+            }
+          })
+          .then(response => { 
+            console.log(response)
+          })
+          .catch(error => {
+            console.log(error.response)
+          });
+      } catch (e) {
+        console.log(e)
+      }
   }
 
   
