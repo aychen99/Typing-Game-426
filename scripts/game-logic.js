@@ -38,12 +38,13 @@ function getText() {
     return text;
 }
 
-function createGameOverScreen(totalCharsTyped, wordErrorNum, textWordsArray, totalTimeMS) {
+function createGameOverPrompt(currentWordNum, userTypedWords, originalWords, totalTimeMS) {
     $('#typing-section').append(`
         <section class="section">
-            Game over! Your adjusted WPM was ${getAdjustedWPM}, in a total 
-            typing time of ${Math.round(totalTimeMS/1000)} seconds! 
-            (Accuracy not guaranteed yet)
+            Game over! Your raw WPM was ${$('#stats-wpm').text()}, 
+            and accounting for mistyped words, your adjusted WPM was 
+            ${getAdjustedWPM(currentWordNum, userTypedWords, originalWords, totalTimeMS)}, 
+            in a total typing time of ${Math.round(totalTimeMS/1000)} seconds!
         </section>
     `);
     $('#user-input').prop('disabled', true);
@@ -57,6 +58,8 @@ function updateWPMDisplay(wpm) {
     $('#stats-wpm').html(wpm);
 }
 
+// Calculates WPM based purely on how many words have been typed so far 
+// and the length of all those words
 function getRawWPM(currentWordNum, originalWords, charNumOfWord, timeElapsedMS) {
     let charsTyped = charNumOfWord;
     originalWords.some(function(word, index) {
@@ -70,8 +73,26 @@ function getRawWPM(currentWordNum, originalWords, charNumOfWord, timeElapsedMS) 
     return Math.round(charsTyped / 5 * 60 / (timeElapsedMS / 1000));
 }
 
-function getAdjustedWPM() {
-
+// Calculates WPM, but removing the character length of any incorrect words
+// from the calculation.
+function getAdjustedWPM(currentWordNum, userTypedWords, originalWords, timeElapsedMS) {
+    let adjustedCharsTyped = 0;
+    originalWords.some(function(word, index) {
+        if (index == currentWordNum) {
+            if (userTypedWords[index] == word.slice(0, 
+                                            userTypedWords[index].length)) {
+                adjustedCharsTyped += userTypedWords[index].length;
+            }
+            return true;
+        } else {
+            if (userTypedWords[index] == word) {
+                adjustedCharsTyped += word.length;
+            }
+            adjustedCharsTyped += 1; // spaces never count as incorrect
+            return false;
+        }
+    });
+    return Math.round(adjustedCharsTyped / 5 * 60 / (timeElapsedMS / 1000));
 }
 
 export default function loadTypingGame() {
@@ -152,8 +173,8 @@ export default function loadTypingGame() {
 
     function triggerGameOver() {
         endTime = new Date().getTime();
-        createGameOverScreen(globalCharNum, 
-                             wordErrorNum, 
+        createGameOverPrompt(currentWordNum, 
+                             typedWords, 
                              textWordsArray, 
                              endTime - startTime);
     }
