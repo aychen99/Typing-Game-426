@@ -18,7 +18,7 @@ function renderNavbar() {
   let navbar = `
   <div class="container navbar-container">
     <div class="navbar-brand">
-      <a class="navbar-item" id="navbar-brand" href="#">
+      <a class="navbar-item" id="navbar-brand" href="/">
         Blaze Typing
       </a>
     </div>
