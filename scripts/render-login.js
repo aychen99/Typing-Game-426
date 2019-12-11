@@ -1,7 +1,6 @@
 import config from "../config.js";
 import installLobbyButton from "./lobbies.js";
 
-
 let url = config.url;
 
 async function createDefaultLobbies() {
