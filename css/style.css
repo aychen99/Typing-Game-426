@@ -3,10 +3,24 @@
   src: url(../fonts/gluottine.ttf);
 }
 
+/* Standard/helper selectors */
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+.is-centered {
+  text-align: center;
+}
+
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+
+/* Dark and Light Mode Selectors */
 .dark-mode-body {
   background-color: rgb(32, 32, 32);
   color: white;
@@ -27,10 +41,6 @@ body {
   border: 2px solid;
   border-radius: 12px;
   border-color: black;
-}
-
-.is-centered {
-  text-align: center;
 }
 
 .light-mode-title {
@@ -65,13 +75,6 @@ body {
   background-color: black;
 }
 
-.footer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
 /*.absolute-bottom {
   position: absolute;
   left: 0;
@@ -79,6 +82,8 @@ body {
   bottom: 0;
 }*/
 
+
+/* Navbar selectors */
 #navbar-brand {
   font-family: Gluottine;
   font-size: 40px;
@@ -120,6 +125,8 @@ body {
   margin-bottom: 0px;
 } */
 
+
+/* Selectors for results of clicking buttons */
 .prompt-background {
   height: 100vh;
   width: 100vw;
@@ -188,14 +195,14 @@ body {
   margin-right: auto;
 }
 
-#signup-prompt {
 
+/* Selectors for leaderboard autocomplete */
+.autocomplete {
+  width: 100%;
 }
 
-#login-prompt {
 
-}
-
+/* Selectors for typing section */
 #typing-section-header {
   margin-bottom: 10px;
   color: aqua;

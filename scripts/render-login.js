@@ -175,6 +175,23 @@ async function createUserSettings() {
   });
 }
 
+async function initializeUserOnLeaderboard() {
+  await axios({
+    method: "post",
+    url: url + "/public/leaderboards/" + localStorage['typing-username'],
+    headers: {
+      Authorization: "Bearer " + localStorage.jwt
+    },
+    data: {
+      data: {
+        "Games Played": 0,
+        "Average WPM": 0,
+        "Highest WPM": 0
+      }
+    }
+  });
+}
+
 /**
  * Logs user in using an axios post call.
  * @param {string} username
@@ -218,14 +235,18 @@ async function logUserInFirstTime(username, password) {
       name: username,
       pass: password
     }
-  }).then(response => {
+  }).then(async response => {
     // After logging in successfully, set the jwt (local log in cache) values
     window.localStorage.setItem("jwt", response.data["jwt"]);
     window.localStorage.setItem("typing-username", response.data["name"]);
 
     // Creating the user's default profile & settings when they first log in
-    createUserProfile(username);
-    createUserSettings();
+    await createUserProfile(username);
+    await createUserSettings();
+
+    // TODO: TEMP HACK: Initialize user's position in the leaderboards
+    // on first log in
+    await initializeUserOnLeaderboard();
 
     // Reload to show the user is logged in
     location.reload();

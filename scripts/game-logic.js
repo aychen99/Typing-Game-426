@@ -69,7 +69,8 @@ async function createGameOverPrompt(currentWordNum, userTypedWords, originalWord
                           + adjustedWPM) / (profile['Games Played'] + 1);
             let highestWPM = Math.max(profile['Highest WPM'], adjustedWPM);
 
-            let postResult = await axios({
+            // Update user profile
+            await axios({
                 method: 'post',
                 url: url + '/user/profile',
                 headers: {
@@ -77,13 +78,40 @@ async function createGameOverPrompt(currentWordNum, userTypedWords, originalWord
                 },
                 data: {
                     data: {
-                        "DisplayName": profile['DisplayName'],
                         "Games Played": (profile['Games Played'] + 1),
                         "Average WPM": avgWPM,
                         "Highest WPM": highestWPM
                     }
                 }
             });
+
+            // Update leaderboards; error tolerance allowed on this one.
+            // This is a temporary hack accounting for the limitations of 
+            // the provided comp426-backend, by making publicly 
+            // viewable leaderboards be stored in the public store.
+            let attempts = 0;
+            let leaderboardsPostSuccess = false
+            while (attempts < 5 && !leaderboardsPostSuccess) {
+                try {
+                    await axios({
+                        method: 'post',
+                        url: url + '/public/leaderboards/' + localStorage['typing-username'],
+                        headers: {
+                            Authorization: "Bearer " + localStorage.jwt
+                        },
+                        data: {
+                            data: {
+                                "Games Played": (profile['Games Played'] + 1),
+                                "Average WPM": avgWPM,
+                                "Highest WPM": highestWPM
+                            }
+                        }
+                    });
+                    leaderboardsPostSuccess = true;
+                } catch {
+                    attempts++;
+                }
+            }
 
             updateProfileSuccessMessage = `
                 <div class="has-background-success" id="save-results-message">
