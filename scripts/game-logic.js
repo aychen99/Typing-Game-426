@@ -1,3 +1,5 @@
+import url from '../config.js';
+
 function loadTextToType(textAsHTML) {
     $('#text-to-type').html(textAsHTML);
 }
@@ -38,16 +40,82 @@ function getText() {
     return text;
 }
 
-function createGameOverPrompt(currentWordNum, userTypedWords, originalWords, totalTimeMS) {
+async function createGameOverPrompt(currentWordNum, userTypedWords, originalWords, totalTimeMS) {
+    let adjustedWPM = getAdjustedWPM(currentWordNum, userTypedWords, originalWords, totalTimeMS);
+    
     $('#typing-section').append(`
-        <section class="section">
+        <div class="has-background-info has-text-white" id="results">
             Game over! Your raw WPM was ${$('#stats-wpm').text()}, 
             and accounting for mistyped words, your adjusted WPM was 
-            ${getAdjustedWPM(currentWordNum, userTypedWords, originalWords, totalTimeMS)}, 
+            ${adjustedWPM}, 
             in a total typing time of ${Math.round(totalTimeMS/1000)} seconds!
-        </section>
+        </div>
     `);
     $('#user-input').prop('disabled', true);
+    
+    let updateProfileSuccessMessage = '';
+    async function updateServerData() {
+        try {
+            let profile = (await axios({
+                method: 'get',
+                url: url + '/user/profile',
+            })).data.result;
+            
+            // console.log(profile);
+            avgWPM = (profile['Average WPM'] * profile['Games Played']
+                      + adjustedWPM) / (profile['Games Played'] + 1);
+            highestWPM = Math.max(profile['Highest WPM'], adjustedWPM);
+
+            let postResult = await axios({
+                method: 'post',
+                url: url + '/user/profile',
+                data: {
+                    data: {
+                        "DisplayName": profile['DisplayName'],
+                        "Games Played": (profile['Games Played'] + 1),
+                        "Average WPM": avgWPM,
+                        "Highest WPM": highestWPM
+                    }
+                }
+            });
+
+            // console.log(postResult);
+            return true;
+        } catch (e) {
+            updateProfileSuccessMessage = `
+                <div class="has-background-warning" id="save-results-message">
+                    <p>
+                        Error: failed to send game results to server!
+                        Please hit the button to retry!
+                    </p>
+                    <br>
+                    <button class="button" id="reupload-game-results-button">
+                        Reupload Game Results
+                    </button>
+                </div>
+            `;
+            return false;
+        }
+    }
+
+    if (!localStorage.jwt) {
+        updateProfileSuccessMessage = `
+            <div class="has-background-warning" id="save-results-message">
+                It appears that you are not logged in. Next time, create 
+                an account or log in to save your game results!
+            </div>
+        `;
+    } else {
+        await updateServerData();
+    }
+
+    $('#typing-section').append(updateProfileSuccessMessage);
+    $('#reupload-game-results-button').on('click', async function() {
+        let retryResult = await updateServerData();
+        if (retryResult === true) {
+            $('#save-results-message').replace(updateProfileSuccessMessage);
+        }
+    });
 }
 
 function updateErrorDisplay(errorCount) {
