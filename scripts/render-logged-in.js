@@ -10,7 +10,6 @@ let url = config.url;
  * This does NOT return the values of those fields. getProfileValueOf(field) does that.
  */
 async function getProfileFields() {
-<<<<<<< HEAD
   return await axios({
     method: "get",
     url: url + "/user/profile/",
@@ -18,24 +17,6 @@ async function getProfileFields() {
   });
 }
 
-/**
- * Returns a promise that contains the value of a field in a user's profile.
- * E.g. If a user's display name is Jake and you call getProfileValueOf("displayName"), this will return a promise that contains "Jake".
- * 
- * @param {string} field The field that you want the value of.
- */
-async function getProfileValueOf(field) {
-=======
->>>>>>> 6d4d3edaa14319d962190c2afbca787eee968b49
-  return await axios({
-    method: "get",
-    url: url + "/user/profile/",
-    headers: { Authorization: "Bearer " + localStorage.jwt }
-  });
-}
-
-<<<<<<< HEAD
-=======
 /**
  * Returns a promise that contains the value of a field in a user's profile.
  * E.g. If a user's display name is Jake and you call getProfileValueOf("displayName"), this will return a promise that contains "Jake".
@@ -50,7 +31,6 @@ async function getProfileValueOf(field) {
   });
 }
 
->>>>>>> 6d4d3edaa14319d962190c2afbca787eee968b49
 function installLogoutButton() {
   $("#logout-button").on("click", function() {
     localStorage.removeItem("jwt");
@@ -123,7 +103,6 @@ function installProfileButton() {
     
       
     })
-<<<<<<< HEAD
 
     // getProfileValueOf("displayName").then(response => {
     //   let profile = response.data.result;
@@ -148,32 +127,6 @@ function installProfileButton() {
     //                       <span class="has-text-gray">${profile["theme"]}</span>
     //                   </div>
 
-=======
-
-    // getProfileValueOf("displayName").then(response => {
-    //   let profile = response.data.result;
-    //   console.log(profile);
-    //   $("body").append(`
-    //           <div class="prompt-background" id="profile-prompt-background">
-    //               <div class="menu-prompt">
-    //                   <p class="has-text-centered is-size-3">
-    //                       Profile for <span class="has-text-info">${localStorage["typing-username"]}</span>:
-    //                   </p>
-    //                   <br>
-    //                   <div>
-    //                       <span class="has-text-weight-bold">Games Played: </span>
-    //                       <span class="has-text-gray">${profile["gamesPlayed"]}</span>
-    //                   </div>
-    //                   <div>
-    //                       <span class="has-text-weight-bold">Words Per Minute: </span>
-    //                       <span class="has-text-gray">${profile["avgWPM"]}</span>
-    //                   </div>
-    //                   <div>
-    //                       <span class="has-text-weight-bold">Theme: </span>
-    //                       <span class="has-text-gray">${profile["theme"]}</span>
-    //                   </div>
-
->>>>>>> 6d4d3edaa14319d962190c2afbca787eee968b49
     //                   <br>
     //                   <button class="button is-warning" id="close-prompt">Close</button>
     //               </div>
