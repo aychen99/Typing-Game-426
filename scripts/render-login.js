@@ -147,6 +147,35 @@ async function createUserProfile(displayName) {
 }
 
 /**
+ * Creates default settings for a user.
+ */
+async function createUserSettings() {
+  await axios({
+    method: "post",
+    url: url + "/user/settings/",
+    headers: {
+      Authorization: "Bearer " + localStorage.jwt
+    },
+    data: {
+      data: {
+        "Typing Duration": {
+          value: 1,
+          options: [1, 3, 5]
+        },
+        "Text Difficulty": {
+          value: "Easy",
+          options: ["Easy", "Medium", "Hard"]
+        },
+        "Text Length": {
+          value: "Medium",
+          options: ["Short", "Medium"]
+        }
+      }
+    }
+  });
+}
+
+/**
  * Logs user in using an axios post call.
  * @param {string} username
  * @param {string} password
@@ -194,8 +223,9 @@ async function logUserInFirstTime(username, password) {
     window.localStorage.setItem("jwt", response.data["jwt"]);
     window.localStorage.setItem("typing-username", response.data["name"]);
 
-    // Creating the user's default profile when they first log in
+    // Creating the user's default profile & settings when they first log in
     createUserProfile(username);
+    createUserSettings();
 
     // Reload to show the user is logged in
     location.reload();
