@@ -3,6 +3,8 @@ import { installLobbyButton } from "./lobbies.js";
 
 let url = config.url;
 
+console.log(localStorage["typing-username"]);
+
 /**
  * Makes a post call to update the settings of the user.
  * 
@@ -107,6 +109,9 @@ function installProfileButton() {
 
           <!-- RENDERING JS CODE IN THESE DIVS -->
           <div id="profile-header-container">
+            <p class="has-text-centered is-size-3">
+              Profile for <span class="has-text-info">${localStorage["typing-username"]}</span>
+            </p>
           </div>
 
           <div class="is-centered" id="profile-info-container">
@@ -127,17 +132,8 @@ function installProfileButton() {
         getProfileValueOf(fieldName).then(response => {
           let fieldValue = response.data.result;
 
-          // Text renders differently for display name
-          if (fieldName == "Display Name") {
-            $("#profile-header-container").append(`
-            <p class="has-text-centered is-size-3">
-              Profile for <span class="has-text-info">${fieldValue}</span>
-            </p>
-
-            <br>
-            `);
-          } else { // Every other field
-            $("#profile-info-container").append(`
+          // Renders each field and value
+          $("#profile-info-container").append(`
             <div>
               <span class="has-text-weight-bold">
                 ${fieldName}:
@@ -145,8 +141,6 @@ function installProfileButton() {
               <span class="has-text-gray">${fieldValue}</span>
             </div>
             `);
-          }
-
         });
         
       }
