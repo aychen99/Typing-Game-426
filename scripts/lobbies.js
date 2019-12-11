@@ -9,7 +9,6 @@ export class Lobby {
         this.users = [];
         this.hasPasscode = false;
         this.passcode = "";
-
     }
 
     join(name) {
@@ -17,7 +16,7 @@ export class Lobby {
     }
 }
 
-export function installLobbyButton() {
+export default function installLobbyButton() {
     $("#lobby-button").on("click", function () {
       createLobbyList();
     })
