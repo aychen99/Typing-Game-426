@@ -229,5 +229,4 @@ async function signUserUp(username, password) {
 export default function installButtonsNotLoggedIn() {
   installLoginButton();
   installSignupButton();
-  installLobbyButton();
 }
