@@ -233,7 +233,7 @@ function handleCloseProfileButtonPress(event) {
 
 export default function installButtonsLoggedIn() {
     installLogoutButton();
-    installSettingsButton();
+    installProfileButton();
     installLobbyButton();
 }
 

@@ -99,10 +99,18 @@ async function createLobbyList() {
 
 function showLobbies(array) {
   let hold = "";
-  for (let i = array.length - 1; i >= 0; i--) {
+  
+  for (let i = array.length - 1; i > 3; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><a href = "#" onclick="return false;">${array[i].name + " " + array[i].owner} </span>
+        <span class="has-text-gray"><button id="${array[i].name}button">${array[i].name + " | Created By: " + array[i].owner}</button></span>
+      </div>` + hold
+  }
+
+  for (let i = 3; i >= 0; i--) {
+    hold =
+      `<div>
+        <span class="has-text-gray"><button id="${array[i].name}button">${array[i].name}</button></span>
       </div>` + hold
   }
   return hold;
