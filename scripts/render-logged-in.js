@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import config from "../config.js"
 import { installLobbyButton } from "./lobbies.js";
-=======
-import config from "../config.js";
->>>>>>> 653e389714e435cc8d67811a605cf6506aaa7d9e
 
 let url = config.url;
 
@@ -161,13 +157,8 @@ function installSettingsButton() {
 }
 
 export default function installButtonsLoggedIn() {
-<<<<<<< HEAD
     installLogoutButton();
     installSettingsButton();
     installLobbyButton();
 }
-=======
-  installLogoutButton();
-  installSettingsButton();
-}
->>>>>>> 653e389714e435cc8d67811a605cf6506aaa7d9e
+
