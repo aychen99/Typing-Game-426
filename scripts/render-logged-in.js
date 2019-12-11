@@ -109,7 +109,7 @@ function installProfileButton() {
           <div id="profile-header-container">
           </div>
 
-          <div id="profile-info-container">
+          <div class="is-centered" id="profile-info-container">
           </div>
 
           <div id="profile-buttons-container">

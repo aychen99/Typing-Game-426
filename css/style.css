@@ -157,7 +157,7 @@ body {
 .menu-prompt {
   color: white;
   background-color: rgba(46, 46, 46, 0.9);
-  padding: 52px 72px;
+  padding: 92px 72px;
   margin-top: 104px;
   margin-left: auto;
   margin-right: auto;
@@ -180,6 +180,12 @@ body {
   opacity: 1.0;
   z-index: 101;
   border-radius: 10px;
+}
+
+#profile-buttons-container {
+  width: 170px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #signup-prompt {
