@@ -1,7 +1,29 @@
 import config from "../config.js";
-import Lobby from "../scripts/lobbies.js";
+import installLobbyButton from "./lobbies.js";
 
 let url = config.url;
+
+async function createDefaultLobbies() {
+  try {
+  axios.post( url + "/public/Lobbies/", {
+    data: {
+        Default : new Lobby("Default"),
+        Beginner : new Lobby("Beginners"),
+        Average : new Lobby("Average"),
+        Expert : new Lobby("Experts"),
+    }
+  })
+  .catch(error => {
+    console.log(error.response)
+  });
+} catch {
+  $("#uap-header").html(`
+              <span class="has-text-danger">Login failed! Try again!</span>
+          `);
+}
+}
+
+createDefaultLobbies();
 
 /**
  * Adds event listener to login button
@@ -206,4 +228,5 @@ async function signUserUp(username, password) {
 export default function installButtonsNotLoggedIn() {
   installLoginButton();
   installSignupButton();
+  installLobbyButton();
 }
