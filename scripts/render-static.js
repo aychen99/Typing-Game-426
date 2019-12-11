@@ -27,7 +27,6 @@ function renderNavbar() {
       <div class="navbar-end">
         <a class="navbar-item" href="#" id="lobby-button">Lobby</a>
         <a class="navbar-item" href="#">Leaderboards</a>
-        <a class="navbar-item" href="#">Profile</a>
 
         ${buttonDivHTML}
       </div>
@@ -43,7 +42,7 @@ function getButtonsHTML() {
     // User is logged in
     return `<div class="buttons">
       <a class="button is-primary is-outlined" id="logout-button">Logout</a>
-      <a class="button is-primary" id="settings-button">Settings</a>
+      <a class="button is-primary" id="profile-button">Profile</a>
       <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
     </div>`;
   } else {
