@@ -26,3 +26,6 @@ Then run this command in the root directory of this project
 ```
 browser-sync start -sw
 ```
+
+## Other resources
+We used the COMP 426 backend to host our backend, found here -> https://github.com/cgburgess/comp426-backend
