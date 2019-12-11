@@ -1,4 +1,5 @@
-import url from '../config.js';
+import config from '../config.js';
+let url = config.url;
 
 function loadTextToType(textAsHTML) {
     $('#text-to-type').html(textAsHTML);
@@ -59,16 +60,21 @@ async function createGameOverPrompt(currentWordNum, userTypedWords, originalWord
             let profile = (await axios({
                 method: 'get',
                 url: url + '/user/profile',
+                headers: {
+                    Authorization: "Bearer " + localStorage.jwt
+                },
             })).data.result;
             
-            // console.log(profile);
-            avgWPM = (profile['Average WPM'] * profile['Games Played']
-                      + adjustedWPM) / (profile['Games Played'] + 1);
-            highestWPM = Math.max(profile['Highest WPM'], adjustedWPM);
+            let avgWPM = (profile['Average WPM'] * profile['Games Played']
+                          + adjustedWPM) / (profile['Games Played'] + 1);
+            let highestWPM = Math.max(profile['Highest WPM'], adjustedWPM);
 
             let postResult = await axios({
                 method: 'post',
                 url: url + '/user/profile',
+                headers: {
+                    Authorization: "Bearer " + localStorage.jwt
+                },
                 data: {
                     data: {
                         "DisplayName": profile['DisplayName'],
@@ -79,9 +85,15 @@ async function createGameOverPrompt(currentWordNum, userTypedWords, originalWord
                 }
             });
 
-            // console.log(postResult);
+            updateProfileSuccessMessage = `
+                <div class="has-background-success" id="save-results-message">
+                    <p class="has-text-weight-bold">
+                        Results posted to server successfully!
+                    </p>
+                </div>
+            `;
             return true;
-        } catch (e) {
+        } catch {
             updateProfileSuccessMessage = `
                 <div class="has-background-warning" id="save-results-message">
                     <p>
