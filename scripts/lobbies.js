@@ -23,26 +23,6 @@ function installLobbyButton() {
     })
   }
 
-async function createDefaultLobbies() {
-      try {
-      axios.post( url + "/public/Lobbies/", {
-        data: {
-            Default : new Lobby("Default"),
-            Beginner : new Lobby("Beginners"),
-            Average : new Lobby("Average"),
-            Expert : new Lobby("Experts"),
-        }
-      })
-      .catch(error => {
-        console.log(error.response)
-      });
-    } catch {
-      $("#uap-header").html(`
-                  <span class="has-text-danger">Login failed! Try again!</span>
-              `);
-    }
-  }
-
   async function getLobbies() {
     try {
       let result = await axios({
@@ -185,6 +165,5 @@ async function createDefaultLobbies() {
 
   
   export default function makeLobbies() {
-    createDefaultLobbies();
     installLobbyButton();
 }
