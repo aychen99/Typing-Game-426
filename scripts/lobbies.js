@@ -17,7 +17,7 @@ export class Lobby {
     }
 }
 
-function installLobbyButton() {
+export function installLobbyButton() {
     $("#lobby-button").on("click", function () {
       createLobbyList();
     })
@@ -162,8 +162,3 @@ function installLobbyButton() {
         console.log(e)
       }
   }
-
-  
-  export default function makeLobbies() {
-    installLobbyButton();
-}

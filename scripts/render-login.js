@@ -1,5 +1,5 @@
 import config from "../config.js";
-import makeLobbies from "./lobbies.js";
+import installLobbyButton from "./lobbies.js";
 
 
 let url = config.url;
@@ -142,5 +142,5 @@ function createUserActionPrompt(mode) {
 export default function installButtonsNotLoggedIn() {
   installLoginButton();
   installSignupButton();
-  makeLobbies();
+  installLobbyButton();
 }
