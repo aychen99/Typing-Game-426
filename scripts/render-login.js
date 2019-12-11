@@ -131,17 +131,17 @@ function createUserActionPrompt(mode) {
 /**
  * Creates a default user profile
  */
-async function createPublicUserProfile(displayName) {
+async function createUserProfile(displayName) {
   await axios({
     method: "post",
     url: url + "/user/profile/",
     headers: { Authorization: "Bearer " + localStorage.jwt },
     data: {
       data: {
-        displayName: displayName,
-        gamesPlayed: 0,
-        avgWPM: 0,
-        highestWPM: 0
+        "Display Name": displayName,
+        "Games Played": 0,
+        "Average WPM": 0,
+        "Highest WPM": 0
       }
     }
   }).then(response => {
@@ -200,7 +200,7 @@ async function logUserInFirstTime(username, password) {
     window.localStorage.setItem("typing-username", response.data["name"]);
 
     // Creating the user's default profile when they first log in
-    createPublicUserProfile(username);
+    createUserProfile(username);
 
     // Reload to show the user is logged in
     location.reload();
