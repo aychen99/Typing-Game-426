@@ -44,14 +44,14 @@ function getButtonsHTML() {
     return `<div class="buttons">
       <a class="button is-primary is-outlined" id="logout-button">Logout</a>
       <a class="button is-primary" id="profile-button">Profile</a>
-      <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
+      <!-- <a class="button is-primary" id="theme-button">Dark/Light Mode</a> -->
     </div>`;
   } else {
     // User is not logged in
     return `<div class="buttons">
       <a class="button is-primary is-outlined" id="login-button">Login</a>
       <a class="button is-primary" id="signup-button">Signup</a>
-      <a class="button is-primary" id="theme-button">Dark/Light Mode</a>
+      <!-- <a class="button is-primary" id="theme-button">Dark/Light Mode</a> -->
     </div>`;
   }
 }
@@ -136,14 +136,6 @@ function handleThemeButtonPress(e) {
   isDark = !isDark;
 }
 
-function onSignIn(googleUser) {
-  var profile = googleUser.getBasicProfile();
-  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-}
-
 /**
  * After the page finishes loading, renders everything and sets up event listeners
  */
@@ -153,8 +145,6 @@ $(function() {
 
   // Add event listeners
   $("#theme-button").on("click", handleThemeButtonPress);
-
-  // console.log(localStorage.isGoogle);
 
   // Change button event handlers based on if user is logged in or not
   if (localStorage.jwt != undefined || localStorage.isGoogle != undefined) {
