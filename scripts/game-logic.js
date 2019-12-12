@@ -262,7 +262,7 @@ export default async function loadTypingGame(lobbyName) {
 
     // Variables required for game logic
     let charNumOfWord = 0;
-    // let globalCharNum = 0;
+    let globalCharNum = 0; // Not used for now
     let currentWordNum = 0;
     let typedWords = new Array(numTotalWords).fill('');
     let wordErrorNum = 0;

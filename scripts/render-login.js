@@ -80,9 +80,9 @@ function createDefaultLobbies() {
     Source: Wikibooks, Wikijunior, Big Cats, Lion`;
 
   expertLobby.text = `
-    Become one with the randomness. Good luck!
+    Become one with the randomness. Good luck, bud.
 
-    Hamilton’s real quaternions H and biquaternions B are constructed from 
+    Hamilton's real quaternions H and biquaternions B are constructed from 
     pairs of division binarions or complex binarions, respectively. 
     These operations are defined:
 

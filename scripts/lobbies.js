@@ -142,7 +142,7 @@ async function handleLobbyClick(name) {
   } else {
     lobby.users.push("Guest 007");
   }
-  loadTypingGame(lobby.name);
+  await loadTypingGame(lobby.name);
 }
 
 function createALobby() {
