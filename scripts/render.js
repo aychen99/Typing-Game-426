@@ -1,4 +1,5 @@
 import loadTypingGame from './game-logic.js';
+import { lobbyClicked, getLobby } from "./lobbies.js"
 
 /***
  * This file is used to render elements on the home page.
@@ -28,7 +29,8 @@ function renderTypingSectionHeader() {
         title
         is-3
         is-centered
-        dark-mode-title">
+        dark-mode-title"
+        id="hope">
         WELCOME TO BLAZE TYPING 426
       </h3>
       <h5 class="subtitle is-5 is-centered dark-mode-subtitle" id="home-prompt">Type the following text:</h5>

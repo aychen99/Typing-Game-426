@@ -1,7 +1,10 @@
 import config from "../config.js";
 
+
 let url = config.url;
 let allLobbies;
+let clickLobby = false;
+let holdLobby;
 
 //A lobby class
 export default class Lobby {
@@ -13,9 +16,6 @@ export default class Lobby {
     this.owner = "";
   }
 
-  join(name) {
-    users.push(name);
-  }
 }
 
 export function installLobbyButton() {
@@ -63,8 +63,8 @@ async function createLobbyList() {
               `);
     //Gets the lobby that was clicked on and "returns" it?
     $("button").click(function() {
-      console.log(this.id);
       handleLobbyClick(this.id);
+      console.log(this.id);
     });
     $('#close-prompt').on('click', function (e) {
       $('#lobbies-prompt-background').remove();
@@ -127,15 +127,21 @@ function showLobbies(array) {
 
 function handleLobbyClick(name) {
   let lobby;
+  clickLobby = true;
   for (let i = 0; i < allLobbies.length; i++) {
     if (name == allLobbies[i].name) {
       lobby = allLobbies[i];
+      holdLobby = lobby;
     }
   }
 
   $(`#${name}`).on("click", function () {
-    console.log("does this work");
-    lobby.users.push(localStorage['typing-username']);
+    document.getElementById("hope").innerHTML = `${lobby.name + " Room"}`;
+    if (localStorage.jwt) {
+      lobby.users.push(localStorage['typing-username']);
+    } else {
+      lobby.users.push("Guest 007");
+    }
   })
 }
 
@@ -241,4 +247,15 @@ async function deleteLobby() {
     }
   }
   return false;
+}
+
+/*
+Returns whether a lobby was clicked or not
+*/
+export function lobbyClicked() {
+  return clickLobby;
+}
+
+export function getLobby() {
+  return holdLobby;
 }
