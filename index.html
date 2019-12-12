@@ -5,6 +5,8 @@
   <meta charset='utf-8'>
   <title>Blaze Typing</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <meta name="google-signin-client_id"
+    content="125779793222-ft245fmo52jmjdd7fmvqcsukguq8tcri.apps.googleusercontent.com">
 
   <link rel="stylesheet" type="text/css" href="node_modules/bulma/css/bulma.min.css">
   <link rel="stylesheet" type="text/css" href="css/bulma_style.css">
@@ -13,17 +15,140 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 
 <body>
+  <!--- LOG IN PROMPT HIDDEN BY DEFAULT --->
+  <div class="prompt-background is-hidden" id="login-prompt-bg">
+    <div class="user-prompt">
+      <p class="has-text-centered is-size-4" id="uap-header">
+        Login Here!
+      </p>
+
+      <div class="field">
+        <label class="label has-text-link">Username:</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="Username" name="username" id="login-username">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label has-text-link">Password:</label>
+        <div class="control">
+          <input class="input" type="password" placeholder="Password" name="password" id="login-password">
+        </div>
+      </div>
+
+      <br>
+
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+      <button class="button is-success" id="submit-login-action">Login</button>
+      <button class="button is-warning" id="cancel-login-action">Cancel</button>
+    </div>
+  </div>
+
+  <!--- SIGN UP PROMPT HIDDEN BY DEFAULT --->
+  <div class="prompt-background is-hidden" id="signup-prompt-bg">
+    <div class="user-prompt">
+      <p class="has-text-centered is-size-4" id="uap-header">
+        Signup Here!
+      </p>
+
+      <div class="field">
+        <label class="label has-text-link">Username:</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="Username" name="username" id="signup-username">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label has-text-link">Password:</label>
+        <div class="control">
+          <input class="input" type="password" placeholder="Password" name="password" id="signup-password">
+        </div>
+      </div>
+
+      <br>
+
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+      <button class="button is-success" id="submit-signup-action">Signup</button>
+      <button class="button is-warning" id="cancel-signup-action">Cancel</button>
+    </div>
+  </div>
+
+  <!--- NAVBAR --->
   <nav class="navbar is-black" role="navigation" aria-label="main navigation">
   </nav>
 
+  <!--- MAIN VIEW --->
   <section class="section" id="typing-section">
   </section>
 
-  <footer class="footer dark-mode-footer">  
+  <!--- FOOTER --->
+  <footer class="footer dark-mode-footer">
   </footer>
+
+  <script>
+    async function initializeGoogleUser(username) {
+      await axios({
+        method: "post",
+        url: url + "/account/login",
+        data: {
+          name: username,
+          pass: password
+        }
+      }).then(async response => {
+        // After logging in successfully, set the jwt (local log in cache) values
+        window.localStorage.setItem("jwt", response.data["jwt"]);
+        window.localStorage.setItem("typing-username", response.data["name"]);
+
+        // Creating the user's default profile & settings when they first log in
+        await createUserProfile(username);
+        await createUserSettings();
+
+        // TODO: TEMP HACK: Initialize user's position in the leaderboards
+        // on first log in
+        await initializeUserOnLeaderboard();
+
+        // Reload to show the user is logged in
+        location.reload();
+      }).catch(error => {
+        console.log(error.response);
+      });
+    }
+
+    function onSignIn(googleUser) {
+      // Useful data for your client-side scripts:
+      var profile = googleUser.getBasicProfile();
+      console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+      console.log('Full Name: ' + profile.getName());
+      console.log('Given Name: ' + profile.getGivenName());
+      console.log('Family Name: ' + profile.getFamilyName());
+      console.log("Image URL: " + profile.getImageUrl());
+      console.log("Email: " + profile.getEmail());
+
+      // The ID token you need to pass to your backend:
+      var id_token = googleUser.getAuthResponse().id_token;
+      console.log("ID Token: " + id_token);
+
+      // Info
+      let username = profile.getEmail();
+
+      // Initialize Google user into database if it's their first time signing in
+      if (!localStorage[profile.getId()]) {
+        
+        console.log("hello");
+      }
+      // initializeGoogleUser(username);
+
+      // Sets local login cache
+      if (!localStorage.isGoogle) {
+        localStorage.setItem("isGoogle", true);
+        location.reload();
+      }
+    }
+  </script>
 
   <script src='scripts/render.js' type="module"></script>
   <script src='scripts/render-static.js' type="module"></script>

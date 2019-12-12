@@ -125,8 +125,16 @@ body {
   margin-bottom: 0px;
 } */
 
+.is-hidden {
+  display: none;
+}
+
 
 /* Selectors for results of clicking buttons */
+#login-prompt-bg {
+  /* display: none; */
+}
+
 .prompt-background {
   height: 100vh;
   width: 100vw;

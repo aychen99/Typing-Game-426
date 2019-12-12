@@ -11,7 +11,6 @@ let url = config.url;
  * @param {[*]} fieldOptions 
  */
 async function updateUserSettings(field, value, fieldOptions) {
-  console.log(url + "/user/settings/" + field);
   return await axios({
     method: "post",
     url: url + "/user/settings/" + field,
@@ -84,10 +83,27 @@ async function getSettingsValueOf(field) {
  * Renders logout button.
  */
 function installLogoutButton() {
-  $("#logout-button").on("click", function() {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("typing-username");
+  $("#logout-button").on("click", function () {
+    // Handles Google logout vs server logout
+    if (localStorage.isGoogle) {
+      localStorage.removeItem("isGoogle");
+      signOutGoogle();
+    } else {
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("typing-username");
+    }
+
     location.reload();
+  });
+}
+
+/**
+ * Signs user out of their Google account.
+ */
+function signOutGoogle() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
   });
 }
 
@@ -95,7 +111,7 @@ function installLogoutButton() {
  * Renders profile button in nav bar.
  */
 function installProfileButton() {
-  $("#profile-button").on("click", async function() {
+  $("#profile-button").on("click", async function () {
     // Gets all of the fields of a user's profile (displayName, avgWPM, etc.)
     getProfileFields().then(response => {
       let profileFields = response.data.result;
@@ -140,7 +156,7 @@ function installProfileButton() {
             </div>
             `);
         });
-        
+
       }
 
       // Render settings and exit button
@@ -153,7 +169,7 @@ function installProfileButton() {
       // Button event handlers
       $("#close-profile").on("click", handleCloseProfileButtonPress);
       $("#profile-settings").on("click", handleProfileSettingsButtonPress);
-      
+
     })
   });
 
@@ -202,42 +218,42 @@ async function handleProfileSettingsButtonPress(event) {
 
     // Button event handlers
     $("#cancel-settings").on("click", handleCancelSettingsButtonPress);
-    $("#save-settings").on("click", function() {
+    $("#save-settings").on("click", function () {
       handleSaveSettingsButtonPress(settingsFields);
     });
 
     // Gets the value of each settings field and renders it to the view
-  for (let i = 0; i < settingsFields.length; i++) {
-    let fieldName = settingsFields[i];
+    for (let i = 0; i < settingsFields.length; i++) {
+      let fieldName = settingsFields[i];
 
-    // Gets the value of the settings field
-    getSettingsValueOf(fieldName).then(response => {
-      let fieldValue = response.data.result.value;
-      let fieldOptions = response.data.result.options;
+      // Gets the value of the settings field
+      getSettingsValueOf(fieldName).then(response => {
+        let fieldValue = response.data.result.value;
+        let fieldOptions = response.data.result.options;
 
-      // Renders the setting field name
-      $("#settings-values-container").append(`
+        // Renders the setting field name
+        $("#settings-values-container").append(`
         <span class="has-text-weight-bold">
           ${fieldName}:
         </span>
         `);
 
-      // Renders all of the options
-      for (let j = 0; j < fieldOptions.length; j++) {
-        if (fieldOptions[j] == fieldValue) {
-          $("#settings-values-container").append(`
+        // Renders all of the options
+        for (let j = 0; j < fieldOptions.length; j++) {
+          if (fieldOptions[j] == fieldValue) {
+            $("#settings-values-container").append(`
             <input class="${fieldName.replace(/\s/g, '')}-radio" type="radio" name="${fieldName}" value="${fieldOptions[j]}" checked> ${fieldOptions[j]}
           `)
-        } else {
-          $("#settings-values-container").append(`
+          } else {
+            $("#settings-values-container").append(`
             <input class="${fieldName.replace(/\s/g, '')}-radio" type="radio" name="${fieldName}" value="${fieldOptions[j]}"> ${fieldOptions[j]}
           `)
+          }
         }
-      }
-      $("#settings-values-container").append("<br>");
+        $("#settings-values-container").append("<br>");
 
-    });
-    
+      });
+
     }
   });
 
@@ -261,7 +277,7 @@ function handleSaveSettingsButtonPress(settingsFields) {
     let fieldName = settingsFields[i];
     // Gets the radio buttons for the setting field
     let radioGroup = document.getElementsByName(fieldName);
-    
+
     getSettingsValueOf(fieldName).then(response => {
       let fieldOptions = response.data.result.options;
 
@@ -272,7 +288,7 @@ function handleSaveSettingsButtonPress(settingsFields) {
         }
       }
     });
-    
+
   }
 }
 
@@ -280,8 +296,8 @@ function handleSaveSettingsButtonPress(settingsFields) {
  * Renders the buttons on the nav bar when logged in.
  */
 export default function installButtonsLoggedIn() {
-    installLogoutButton();
-    installProfileButton();
-    installLobbyButton();
+  installLogoutButton();
+  installProfileButton();
+  installLobbyButton();
 }
 

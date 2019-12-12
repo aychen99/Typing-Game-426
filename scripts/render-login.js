@@ -21,50 +21,49 @@ function createDefaultLobbies() {
 createDefaultLobbies();
 
 /**
- * Adds event listener to login button
+ * Adds event listener to login button.
  */
 function installLoginButton() {
   $("#login-button").on("click", function() {
-    createUserActionPrompt("Login");
+    createUserActionPrompt("login");
   });
 }
 
 /**
- * Adds event listener to signup button
+ * Adds event listener to signup button.
  */
 function installSignupButton() {
   $("#signup-button").on("click", function() {
-    createUserActionPrompt("Sign Up");
+    createUserActionPrompt("signup");
   });
 }
 
 /**
- * Adds event handlers to login and signup buttons
- * @param {string} mode
+ * Adds event handlers to login and signup buttons.
+ * @param {string} mode Whether it is "login" or "signup".
  */
 function installPromptButtonHandlers(mode) {
-  if (mode == "Login") {
+  if (mode == "login") {
     // Log in event handler
-    $("#submit-user-action").on("click", async function() {
+    $("#submit-" + mode + "-action").on("click", async function() {
       // Get user credentials
-      let username = $("#username").val();
-      let password = $("#password").val();
+      let username = $("#login-username").val();
+      let password = $("#login-password").val();
 
       // Log user in with provided credentials
       logUserIn(username, password);
     });
-  } else if (mode == "Sign Up") {
+  } else if (mode == "signup") {
     // Sign up event handler
-    $("#submit-user-action").on("click", async function() {
+    $("#submit-" + mode + "-action").on("click", async function() {
+      console.log("CLICK")
       // Get user credentials
-      let username = $("#username").val();
-      let password = $("#password").val();
+      let username = $("#signup-username").val();
+      let password = $("#signup-password").val();
 
       // Sign user up with provided credentials
       signUserUp(username, password)
         .then(response => {
-          console.log("Signed up successfully!");
-
           // Log user in for the first time after signing them up
           logUserInFirstTime(username, password);
         })
@@ -76,55 +75,30 @@ function installPromptButtonHandlers(mode) {
     });
   }
 
-  // Removes the log in prompt if user clicks cancel/close
-  $("#cancel-user-action").on("click", function() {
-    $("#user-action-prompt-background").remove();
+  // Removes the login/signup prompt if user clicks cancel/close
+  $("#cancel-" + mode + "-action").on("click", function() {
+    $("#" + mode + "-prompt-bg").addClass("is-hidden");
   });
 }
 
 /**
- * Creates a prompt for the login and signup popup
- * @param {string} mode
+ * Creates a prompt for the login and signup popup.
+ * @param {string} mode Whether it is "login" or "signup".
  */
 function createUserActionPrompt(mode) {
-  let $prompt = $(`
-        <div class="prompt-background" id="user-action-prompt-background">
-            <div class="user-prompt">
-                <p class="has-text-centered is-size-4" id="uap-header">
-                    ${mode} here!
-                </p>
-                <div class="field">
-                    <label class="label has-text-link">Username:</label>
-                    <div class="control">
-                        <input class="input" 
-                                type="text" 
-                                placeholder="Username"
-                                name="username"
-                                id="username">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label has-text-link">Password:</label>
-                    <div class="control">
-                        <input class="input" 
-                                type="password" 
-                                placeholder="Password"
-                                name="password"
-                                id="password">
-                    </div>
-                </div>
-                <br>
-                <button class="button is-success" id="submit-user-action">${mode}</button>
-                <button class="button is-warning" id="cancel-user-action">Cancel</button>
-            </div>
-        </div>
-    `);
-  $("body").append($prompt);
+  // Shows the prompt of the appropriate mode
+  if (mode == "login") {
+    $("#login-prompt-bg").removeClass("is-hidden");
+  } else if (mode == "signup") {
+    $("#signup-prompt-bg").removeClass("is-hidden");
+  }
+  
+  // Renders the login/signup and cancel buttons
   installPromptButtonHandlers(mode);
 }
 
 /**
- * Creates a default user profile
+ * Creates a default user profile.
  */
 async function createUserProfile(displayName) {
   await axios({
