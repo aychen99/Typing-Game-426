@@ -5,19 +5,24 @@ let url = config.url;
 function getLeaderboardTableHTML(arrayOfUsers) {
     // Transform stats for each user into HTML table elements
     let leaderboardTRows = ``;
-    arrayOfUsers.forEach(function(user, index) {
+    arrayOfUsers.forEach(function(user) {
+        let rowClasses = '';
+        if (user['username'] == localStorage['typing-username']) {
+            rowClasses = 'has-background-info';
+        }
         leaderboardTRows += `
-            <tr>
-                <th>${index + 1}</th>
+            <tr class="${rowClasses}">
+                <th>${user['rank']}</th>
                 <td>${user['username']}</td>
                 <td>${user['Average WPM']}</td>
                 <td>${user['Highest WPM']}</td>
             </tr>
-        `
+        `;
     });
 
     return `
-        <table class="table is-striped is-narrow is-hoverable">
+        <table class="table is-striped is-narrow is-hoverable"
+               id="leaderboard-table">
             <thead>
                 <tr>
                     <th>Rank</th>
@@ -26,19 +31,14 @@ function getLeaderboardTableHTML(arrayOfUsers) {
                     <th>Highest WPM Ever</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="leaderboard-table-body">
                 ${leaderboardTRows}
             </tbody>
         </table>
     `;
 }
 
-async function displayLeaderboardHTML() {
-    let rawLeaderboard = (await axios({
-        method: 'get',
-        url: url + '/public/leaderboards',
-    })).data.result;
-
+function sortLeaderboard(rawLeaderboard) {
     // Sort the leaderboard into an array 
     // in descending order by average WPM
     let leaderboardArray = [];
@@ -51,10 +51,43 @@ async function displayLeaderboardHTML() {
         return user2['Average WPM'] - user1['Average WPM'];
     });
 
-    // Only show the top 10 users
-    leaderboardArray = leaderboardArray.slice(0, 10);
+    leaderboardArray.forEach(function(user, index) {
+        user['rank'] = index + 1;
+    });
+    return leaderboardArray;
+}
+
+async function getLeaderboardHTML(autocompleteUsername) {
+    let rawLeaderboard = (await axios({
+        method: 'get',
+        url: url + '/public/leaderboards',
+    })).data.result;
+
+    let leaderboardArray = sortLeaderboard(rawLeaderboard);
+    leaderboardArray = truncateLeaderboard(leaderboardArray, autocompleteUsername);
 
     return getLeaderboardTableHTML(leaderboardArray);
+}
+
+function truncateLeaderboard(leaderboardArray, autocompleteUsername) {
+    // Only show the top 10 users by default
+    let returnedArray = leaderboardArray.slice(0, 10);
+    if (autocompleteUsername) {
+        let indexAt = 0;
+        leaderboardArray.some(function(userObject, index) {
+            if (userObject['username'] == autocompleteUsername) {
+                indexAt = index;
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (indexAt != 0) {
+            returnedArray = leaderboardArray.slice(
+                    Math.max(0, indexAt-5), indexAt+5);
+        }
+    }
+    return returnedArray;
 }
 
 async function displayAutocompleteUsernames(partialUsername) {
@@ -69,16 +102,50 @@ async function displayAutocompleteUsernames(partialUsername) {
     }
 
     let matchingUsernames = [];
+    let matchingUsernamesHTML = [];
     for (let username of usernameArray) {
         if (partialUsername == '') {
-            break;
+            $('#autocomplete-list').remove();
+            return;
         }
-        if (partialUsername == username.slice(0, partialUsername.length)) {
+        if (partialUsername.toLowerCase() 
+                == username.slice(0, partialUsername.length)
+                           .toLowerCase()) {
+            // Make the matching letters bold in HTML form
+            matchingUsernamesHTML.push(
+                '<div class="autocomplete-item" data-value="' 
+                + username
+                + '" id="choice-' + matchingUsernames.length + '">' 
+                + '<strong>' + partialUsername
+                + '</strong>'
+                + username.slice(partialUsername.length)
+                + '</div>'
+            );
             matchingUsernames.push(username);
         }
     }
+    if (matchingUsernames.length == 0) {
+        $('#autocomplete-list').remove();
+        return;
+    }
+
+    // Limit matching usernames to 10 total
+    matchingUsernamesHTML = matchingUsernamesHTML.slice(0, 10);
 
     // Display the usernames in a drop-down bar
+    // Starter code from https://www.w3schools.com/howto/howto_js_autocomplete.asp
+    
+    // Close any already open lists of autocompleted values
+    $('#autocomplete-list').remove();
+    let autocompleteItems = matchingUsernamesHTML.join(`
+    `);
+
+    let autocompleteList = `
+        <div class="autocomplete-items" id="autocomplete-list">
+            ${autocompleteItems}
+        </div>
+    `;
+    $('#autocomplete-parent-div').append(autocompleteList);
 }
 
 function enableAutocomplete() {
@@ -92,12 +159,30 @@ function enableAutocomplete() {
     }
 
     let $autoCom = $('#autocomplete-bar');
-    $autoCom.on('keyup', () => {
+
+    $(document).on('click', '.autocomplete-item', async function(e) {
+        $autoCom.val($(this).attr('data-value'));
+        $('#autocomplete-list').remove();
+        $('#leaderboard-table').replaceWith(await getLeaderboardHTML($autoCom.val()));
+        e.stopPropagation();
+    });
+    
+    $autoCom.on('keyup', async function(e) {
         let partialUsername = $autoCom.val();
-        debounce(() => {
-            displayAutocompleteUsernames(partialUsername);
-        }, 500);
-    })
+        if (e.which == 13) { // enter key pressed
+            let firstChoice = $('#choice-0').attr('data-value');
+            if (firstChoice == undefined) {
+                firstChoice = partialUsername;
+            }
+            $autoCom.val(firstChoice);
+            $('#autocomplete-list').remove();
+            $('#leaderboard-table').replaceWith(await getLeaderboardHTML($autoCom.val()));
+        } else {
+            debounce(() => {
+                displayAutocompleteUsernames(partialUsername);
+            }, 500);
+        }
+    });
 }
 
 export default function installLeaderboardsButton() {
@@ -110,18 +195,16 @@ export default function installLeaderboardsButton() {
                     </p>
 
                     <!-- Code from https://www.w3schools.com/howto/howto_js_autocomplete.asp -->
-                    <form autocomplete="off" action="/action_page.php">
-                        <div class="autocomplete">
-                            <input class="input"
-                                   id="autocomplete-bar" 
-                                   type="text" 
-                                   name="searchByUsername" 
-                                   placeholder="Search for an user on the leaderboards!">
-                        </div>
-                    </form>
+                    <div class="autocomplete" id="autocomplete-parent-div">
+                        <input class="input"
+                                id="autocomplete-bar" 
+                                type="text" 
+                                name="searchByUsername" 
+                                placeholder="Search for an user on the leaderboards!">
+                    </div>
 
                     <br>
-                    ${await displayLeaderboardHTML()}                       
+                    ${await getLeaderboardHTML()}                       
                     <br>
 
                     <button class="button is-warning" id="close-prompt">Close</button>
