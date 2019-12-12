@@ -203,7 +203,7 @@ function getAdjustedWPM(currentWordNum, userTypedWords, originalWords, timeElaps
     return Math.round(adjustedCharsTyped / 5 * 60 / (timeElapsedMS / 1000));
 }
 
-export default function loadTypingGame() {
+export default async function loadTypingGame() {
     // Current settings are for word-based detection, 
     // as opposed to character-based detection
     let $input = $('#user-input');
@@ -252,6 +252,22 @@ export default function loadTypingGame() {
     let startTime = null;
     let endTime = null;
     let wpm = 0;
+    let timeAllowedMS = 60000; // default 1 minute
+    if (localStorage.jwt) {
+        try {
+            let settingsRequestResult = (await axios({
+                method: 'get',
+                url: url + '/user/settings',
+                headers: { Authorization: "Bearer " + localStorage.jwt }
+            })).data.result;
+
+            timeAllowedMS = settingsRequestResult['Typing Duration']['value']
+                                * 60 * 1000;
+        } catch (e) {
+            // Do nothing on failed HTTP request, 
+            // keep time at default 1 minute
+        }
+    }
 
     function startCountdownTimer(allowedTime) {
         setTimeout(triggerGameOver, allowedTime);
@@ -276,7 +292,7 @@ export default function loadTypingGame() {
     function startTimerHelper() {
         $('#0word').addClass('currentWord');
         startTime = new Date().getTime();
-        startCountdownTimer(30000);
+        startCountdownTimer(timeAllowedMS);
     }
 
     function triggerGameOver() {
