@@ -3,8 +3,6 @@ import { installLobbyButton } from "./lobbies.js";
 
 let url = config.url;
 
-console.log(localStorage["typing-username"]);
-
 /**
  * Makes a post call to update the settings of the user.
  * 

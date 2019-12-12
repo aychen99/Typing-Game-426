@@ -1,5 +1,6 @@
-import installButtonsNotLoggedIn from "./render-login.js"
-import installButtonsLoggedIn from "./render-logged-in.js"
+import installButtonsNotLoggedIn from "./render-login.js";
+import installButtonsLoggedIn from "./render-logged-in.js";
+import installLeaderboardsButton from "./leaderboards.js";
 
 /***
  * This file is used to render elements that will be the same for EVERY page. E.g.) Navbars and footers are the same on every page, so they are defined here.
@@ -26,7 +27,7 @@ function renderNavbar() {
     <div class="navbar-menu is-active">
       <div class="navbar-end">
         <a class="navbar-item" href="#" id="lobby-button">Lobby</a>
-        <a class="navbar-item" href="#">Leaderboards</a>
+        <a class="navbar-item" href="#" id="leaderboards-button">Leaderboards</a>
 
         ${buttonDivHTML}
       </div>
@@ -151,4 +152,6 @@ $(function() {
   } else {
     installButtonsNotLoggedIn();
   }
+
+  installLeaderboardsButton();
 });
