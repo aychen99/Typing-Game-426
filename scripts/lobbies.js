@@ -1,4 +1,5 @@
 import config from "../config.js";
+import loadTypingGame from "./game-logic.js";
 
 
 let url = config.url;
@@ -12,6 +13,7 @@ export default class Lobby {
     this.hasPasscode = false;
     this.passcode = "";
     this.owner = "";
+    this.text = "";
   }
 
 }
@@ -60,7 +62,7 @@ async function createLobbyList() {
                   </div>
               `);
     //Gets the lobby that was clicked on and "returns" it?
-    $("button").click(function() {
+    $(".select-lobby-button").click(function() {
       handleLobbyClick(this.id);
       console.log(this.id);
     });
@@ -115,7 +117,7 @@ function showLobbies(array) {
   for (let i = 3; i >= 0; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth" id="${array[i].name}">${array[i].name}</button></span>
+        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth select-lobby-button" id="${array[i].name}">${array[i].name}</button></span>
       </div>` + hold
       $(`${array[i].name}button`).on('click', handleLobbyClick);
   }
@@ -130,18 +132,17 @@ async function handleLobbyClick(name) {
     }
   }
 
-  $(`#${name}`).on("click", function () {
-    document.getElementById("hope").innerHTML = `${lobby.name + " Room"}`;
-    document.getElementById("users-section-text-container").innerHTML = `${lobby.users}`;
-    //$('#lobbies-prompt-background').remove();
-    if (localStorage.jwt) {
-      if (!lobby.users.includes(localStorage['typing-username'])) {
-        lobby.users.push(localStorage['typing-username']);
-      }
-    } else {
-      lobby.users.push("Guest 007");
+  document.getElementById("hope").innerHTML = `${lobby.name + " Room"}`;
+  document.getElementById("users-section-text-container").innerHTML = `${lobby.users}`;
+  //$('#lobbies-prompt-background').remove();
+  if (localStorage.jwt) {
+    if (!lobby.users.includes(localStorage['typing-username'])) {
+      lobby.users.push(localStorage['typing-username']);
     }
-  })
+  } else {
+    lobby.users.push("Guest 007");
+  }
+  loadTypingGame(lobby.name);
 }
 
 function createALobby() {
