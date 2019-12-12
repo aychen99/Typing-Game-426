@@ -1,5 +1,4 @@
 import loadTypingGame from './game-logic.js';
-import { lobbyClicked, getLobby } from "./lobbies.js"
 
 /***
  * This file is used to render elements on the home page.
@@ -13,6 +12,7 @@ function setupView() {
   $root.append(renderTypingSectionInputBox());
   $root.append(renderTypingSectionTimer());
   $root.append(renderTypingStats());
+  $root.append(renderUsersinLobby());
   $("#typing-section-text-container").append(renderTextToType());
 
   loadTypingGame();
@@ -38,6 +38,16 @@ function renderTypingSectionHeader() {
   `;
 
   return typingSectionHeader;
+}
+
+/** 
+ * Renders a box thats contains all the users in a lobby 
+ */
+function renderUsersinLobby() {
+  return `
+    <div class="container dark-mode-box" id="users-section-text-container">
+    </div>
+  `;
 }
 
 /**

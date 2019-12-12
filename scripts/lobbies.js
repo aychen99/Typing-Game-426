@@ -3,8 +3,6 @@ import config from "../config.js";
 
 let url = config.url;
 let allLobbies;
-let clickLobby = false;
-let holdLobby;
 
 //A lobby class
 export default class Lobby {
@@ -110,35 +108,36 @@ function showLobbies(array) {
   for (let i = array.length - 1; i > 3; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name + " | Created By: " + array[i].owner}</button></span>
+        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth" id="${array[i].name}">${array[i].name + " | Created By: " + array[i].owner}</button></span>
       </div>` + hold
   }
 
   for (let i = 3; i >= 0; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name}</button></span>
+        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth" id="${array[i].name}">${array[i].name}</button></span>
       </div>` + hold
       $(`${array[i].name}button`).on('click', handleLobbyClick);
   }
-  //handleLobbyClick();
   return hold;
 }
 
-function handleLobbyClick(name) {
+async function handleLobbyClick(name) {
   let lobby;
-  clickLobby = true;
   for (let i = 0; i < allLobbies.length; i++) {
     if (name == allLobbies[i].name) {
       lobby = allLobbies[i];
-      holdLobby = lobby;
     }
   }
 
   $(`#${name}`).on("click", function () {
     document.getElementById("hope").innerHTML = `${lobby.name + " Room"}`;
+    document.getElementById("users-section-text-container").innerHTML = `${lobby.users}`;
+    //$('#lobbies-prompt-background').remove();
     if (localStorage.jwt) {
-      lobby.users.push(localStorage['typing-username']);
+      if (!lobby.users.includes(localStorage['typing-username'])) {
+        lobby.users.push(localStorage['typing-username']);
+      }
     } else {
       lobby.users.push("Guest 007");
     }
@@ -247,15 +246,4 @@ async function deleteLobby() {
     }
   }
   return false;
-}
-
-/*
-Returns whether a lobby was clicked or not
-*/
-export function lobbyClicked() {
-  return clickLobby;
-}
-
-export function getLobby() {
-  return holdLobby;
 }
