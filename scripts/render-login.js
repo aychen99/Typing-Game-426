@@ -107,7 +107,7 @@ async function createUserProfile(displayName) {
     headers: { Authorization: "Bearer " + localStorage.jwt },
     data: {
       data: {
-        "Display Name": displayName,
+        // "Display Name": displayName,
         "Games Played": 0,
         "Average WPM": 0,
         "Highest WPM": 0
@@ -215,6 +215,7 @@ async function logUserInFirstTime(username, password) {
     window.localStorage.setItem("typing-username", response.data["name"]);
 
     // Creating the user's default profile & settings when they first log in
+    await addUserToDatabase(username);
     await createUserProfile(username);
     await createUserSettings();
 
@@ -226,6 +227,29 @@ async function logUserInFirstTime(username, password) {
     location.reload();
   }).catch(error => {
     console.log(error.response);
+  });
+}
+
+/**
+ * Adds a user to the public database.
+ * @param {string} username 
+ */
+async function addUserToDatabase(username) {
+  return axios.post(url + "/public/allUsers/usernames",
+    {
+      data: [username],
+      type: "merge"
+    }
+  )
+}
+
+/**
+ * Returns a string array of all usernames.
+ */
+async function getAllUsersFromDatabase() {
+  return await axios({
+    method: "get",
+    url: url + "/public/allUsers/usernames"
   });
 }
 

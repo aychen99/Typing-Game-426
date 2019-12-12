@@ -90,7 +90,106 @@
   </footer>
 
   <script>
-    async function initializeGoogleUser(username) {
+    let url = "http://localhost:3000";
+
+    /**
+     * Adds a user to the public database.
+     * @param {string} username 
+     */
+    async function addUserToDatabase(username) {
+      return axios.post(url + "/public/allUsers/usernames",
+        {
+          data: [username],
+          type: "merge"
+        }
+      )
+    }
+
+    /**
+     * Returns a string array of all usernames.
+     */
+    async function getAllUsersFromDatabase() {
+      return await axios({
+        method: "get",
+        url: url + "/public/allUsers/usernames"
+      });
+    }
+
+    /**
+     * Creates a default user profile.
+     */
+    async function createUserProfile(displayName) {
+      await axios({
+        method: "post",
+        url: url + "/user/profile/",
+        headers: { Authorization: "Bearer " + localStorage.jwt },
+        data: {
+          data: {
+            // "Display Name": displayName,
+            "Games Played": 0,
+            "Average WPM": 0,
+            "Highest WPM": 0
+          }
+        }
+      }).then(response => {
+        console.log(response);
+      }).catch(error => {
+        console.log(error.response);
+      });
+    }
+
+    /**
+     * Creates default settings for a user.
+     */
+    async function createUserSettings() {
+      await axios({
+        method: "post",
+        url: url + "/user/settings/",
+        headers: {
+          Authorization: "Bearer " + localStorage.jwt
+        },
+        data: {
+          data: {
+            "Typing Duration": {
+              value: 1,
+              options: [1, 3, 5]
+            },
+            "Text Difficulty": {
+              value: "Easy",
+              options: ["Easy", "Medium", "Hard"]
+            },
+            "Text Length": {
+              value: "Medium",
+              options: ["Short", "Medium"]
+            }
+          }
+        }
+      });
+    }
+
+    async function initializeUserOnLeaderboard() {
+      await axios({
+        method: "post",
+        url: url + "/public/leaderboards/" + localStorage['typing-username'],
+        headers: {
+          Authorization: "Bearer " + localStorage.jwt
+        },
+        data: {
+          data: {
+            "Games Played": 0,
+            "Average WPM": 0,
+            "Highest WPM": 0
+          }
+        }
+      });
+    }
+
+    /**
+     * Logs user in for the very first time, this is different from a regular log in because it initializes the user's profile.
+     * @param {string} username 
+     * @param {string} password 
+     */
+    async function logUserInFirstTime(username, password) {
       await axios({
         method: "post",
         url: url + "/account/login",
@@ -104,6 +203,7 @@
         window.localStorage.setItem("typing-username", response.data["name"]);
 
         // Creating the user's default profile & settings when they first log in
+        await addUserToDatabase(username);
         await createUserProfile(username);
         await createUserSettings();
 
@@ -112,42 +212,136 @@
         await initializeUserOnLeaderboard();
 
         // Reload to show the user is logged in
-        location.reload();
+        // location.reload();
       }).catch(error => {
         console.log(error.response);
       });
     }
 
+    /**
+     * Logs user in using an axios post call.
+     * @param {string} username
+     * @param {string} password
+     */
+    async function logUserIn(username, password) {
+      await axios({
+        method: "post",
+        url: url + "/account/login",
+        data: {
+          name: username,
+          pass: password
+        }
+      }).then(response => {
+        // After logging in successfully, set the jwt (local log in cache) values
+        window.localStorage.setItem("jwt", response.data["jwt"]);
+        window.localStorage.setItem("typing-username", response.data["name"]);
+
+        // Reload to show the user is logged in
+        // location.reload();
+      })
+        .catch(error => {
+          // If the user enters invalid credentials, display a message
+          console.log(error);
+          $("#uap-header").html(`
+                  <span class="has-text-danger">Login failed! Try again!</span>
+              `);
+        });
+    }
+
+    /**
+     * Signs user up using an axios post call.
+     * @param {string} username
+     * @param {string} password
+     */
+    async function signUserUp(username, password) {
+      return await axios({
+        method: "post",
+        url: url + "/account/create",
+        data: {
+          name: username,
+          pass: password
+        }
+      });
+    }
+
+    /**
+     * Code that executes when a user signs in using their Google account.
+     * */
     function onSignIn(googleUser) {
       // Useful data for your client-side scripts:
       var profile = googleUser.getBasicProfile();
-      console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-      console.log('Full Name: ' + profile.getName());
-      console.log('Given Name: ' + profile.getGivenName());
-      console.log('Family Name: ' + profile.getFamilyName());
-      console.log("Image URL: " + profile.getImageUrl());
-      console.log("Email: " + profile.getEmail());
+      // console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+      // console.log('Full Name: ' + profile.getName());
+      // console.log('Given Name: ' + profile.getGivenName());
+      // console.log('Family Name: ' + profile.getFamilyName());
+      // console.log("Image URL: " + profile.getImageUrl());
+      // console.log("Email: " + profile.getEmail());
 
       // The ID token you need to pass to your backend:
-      var id_token = googleUser.getAuthResponse().id_token;
-      console.log("ID Token: " + id_token);
+      // var id_token = googleUser.getAuthResponse().id_token;
+      // console.log("ID Token: " + id_token);
 
-      // Info
-      let username = profile.getEmail();
-
-      // Initialize Google user into database if it's their first time signing in
-      if (!localStorage[profile.getId()]) {
-        
-        console.log("hello");
-      }
-      // initializeGoogleUser(username);
-
-      // Sets local login cache
+      // Sets local login cache if user is not signed in from previous session when page loads
       if (!localStorage.isGoogle) {
         localStorage.setItem("isGoogle", true);
         location.reload();
+      } else { // User stayed logged in from previous session
+        let email = profile.getEmail();
+        let username = "";
+
+        for (let i = 0; i < email.length; i++) {
+          if (email[i] != "@") {
+            username += email[i];
+          } else {
+            break;
+          }
+        }
+
+        getAllUsersFromDatabase().then(response => {
+          // An array of all the usernames that are registered
+          let allUsers = response.data.result;
+
+          // Generate random password
+          // let password = (Math.random() * 9900).toString();
+
+          // Generate static password
+          let password = "123";
+
+          // If it's the first time sign in from that Google account, initialize that account
+          if (!allUsers.includes(username)) {
+            console.log("User does not exists in the database, initializing user...");
+            console.log("All users: " + allUsers);
+            console.log("Username: " + username);
+            console.log("Password: " + password);
+
+            // Sign user up to server (so that they have a profile)
+            signUserUp(username, password).then(response => {
+              console.log(response);
+              // Add them into the database
+              addUserToDatabase(username);
+              // Log them into the server after signing them up
+              logUserInFirstTime(username, password);
+
+              console.log("Login successful!");
+            }).catch(error => {
+              console.log(error.response);
+            });
+          } else {
+            console.log("this is else");
+            logUserIn(username, password).then(response => {
+              console.log("Logged in successfully");
+            }).catch(error => {
+              console.log(error.response);
+            });
+          }
+        }).catch(error => {
+          console.log(error);
+        });
       }
+
     }
+
+    console.log((Math.random() * 9900).toString());
   </script>
 
   <script src='scripts/render.js' type="module"></script>

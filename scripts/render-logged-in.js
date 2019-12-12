@@ -85,13 +85,13 @@ async function getSettingsValueOf(field) {
 function installLogoutButton() {
   $("#logout-button").on("click", function () {
     // Handles Google logout vs server logout
-    if (localStorage.isGoogle) {
+    // if (localStorage.isGoogle) {
       localStorage.removeItem("isGoogle");
       signOutGoogle();
-    } else {
+    // } else {
       localStorage.removeItem("jwt");
       localStorage.removeItem("typing-username");
-    }
+    // }
 
     location.reload();
   });
@@ -155,6 +155,8 @@ function installProfileButton() {
               <span class="has-text-gray">${fieldValue}</span>
             </div>
             `);
+        }).catch(error => {
+          console.log(error.response);
         });
 
       }
@@ -170,7 +172,11 @@ function installProfileButton() {
       $("#close-profile").on("click", handleCloseProfileButtonPress);
       $("#profile-settings").on("click", handleProfileSettingsButtonPress);
 
+    }).catch(error => {
+      console.log(error.response);
     })
+
+
   });
 
 }
