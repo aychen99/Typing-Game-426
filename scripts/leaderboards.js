@@ -16,6 +16,7 @@ function getLeaderboardTableHTML(arrayOfUsers) {
                 <td>${user['username']}</td>
                 <td>${user['Average WPM']}</td>
                 <td>${user['Highest WPM']}</td>
+                <td>${user['Games Played']}</td>
             </tr>
         `;
     });
@@ -29,6 +30,7 @@ function getLeaderboardTableHTML(arrayOfUsers) {
                     <th>Username</th>
                     <th>Average WPM</th>
                     <th>Highest WPM Ever</th>
+                    <th>Games Played</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-table-body">
@@ -62,6 +64,8 @@ async function getLeaderboardHTML(autocompleteUsername) {
         method: 'get',
         url: url + '/public/leaderboards',
     })).data.result;
+
+    console.log(rawLeaderboard);
 
     let leaderboardArray = sortLeaderboard(rawLeaderboard);
     leaderboardArray = truncateLeaderboard(leaderboardArray, autocompleteUsername);
