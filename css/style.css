@@ -131,9 +131,6 @@ body {
 
 
 /* Selectors for results of clicking buttons */
-#login-prompt-bg {
-  /* display: none; */
-}
 
 .prompt-background {
   height: 100vh;
@@ -157,13 +154,13 @@ body {
 
 .user-prompt {
   color: white;
-  background-color: rgb(158, 201, 94);
-  position: fixed;
-  padding: 10px;
-  height: 40%;
-  width: 75%;
-  top: 15%;
-  left: 15%;
+  background-color: rgba(0, 0, 0, 0.9);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%;
+  padding: 32px;
+  height: 380px;
+  width: 600px;
   opacity: 1.0;
   z-index: 101;
   border-radius: 10px;
@@ -197,10 +194,38 @@ body {
   border-radius: 10px;
 }
 
+#profile-menu-div {
+  margin-top: 200px;
+  width: 400px;
+  height: 400px;
+}
+
 #profile-buttons-container {
+  /* display: inline; */
   width: 170px;
   margin-left: auto;
   margin-right: auto;
+}
+
+#google-btn {
+  /* display: inline; */
+  margin-left: auto;
+  margin-right: auto;
+  width: 120px;
+}
+
+.center-btns-container-login {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 16px;
+  width: 162px;
+}
+
+.center-btns-container-signup {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 16px;
+  width: 170px;
 }
 
 
