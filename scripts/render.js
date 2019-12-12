@@ -12,6 +12,7 @@ function setupView() {
   $root.append(renderTypingSectionInputBox());
   $root.append(renderTypingSectionTimer());
   $root.append(renderTypingStats());
+  $root.append(renderUsersinLobby());
   $("#typing-section-text-container").append(renderTextToType());
 
   loadTypingGame();
@@ -28,7 +29,8 @@ function renderTypingSectionHeader() {
         title
         is-3
         is-centered
-        dark-mode-title">
+        dark-mode-title"
+        id="hope">
         WELCOME TO BLAZE TYPING 426
       </h3>
       <h5 class="subtitle is-5 is-centered dark-mode-subtitle" id="home-prompt">Type the following text:</h5>
@@ -36,6 +38,16 @@ function renderTypingSectionHeader() {
   `;
 
   return typingSectionHeader;
+}
+
+/** 
+ * Renders a box thats contains all the users in a lobby 
+ */
+function renderUsersinLobby() {
+  return `
+    <div class="container dark-mode-box" id="users-section-text-container">
+    </div>
+  `;
 }
 
 /**

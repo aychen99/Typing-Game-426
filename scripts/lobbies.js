@@ -1,5 +1,6 @@
 import config from "../config.js";
 
+
 let url = config.url;
 let allLobbies;
 
@@ -13,9 +14,6 @@ export default class Lobby {
     this.owner = "";
   }
 
-  join(name) {
-    users.push(name);
-  }
 }
 
 export function installLobbyButton() {
@@ -63,8 +61,8 @@ async function createLobbyList() {
               `);
     //Gets the lobby that was clicked on and "returns" it?
     $("button").click(function() {
-      console.log(this.id);
       handleLobbyClick(this.id);
+      console.log(this.id);
     });
     $('#close-prompt').on('click', function (e) {
       $('#lobbies-prompt-background').remove();
@@ -110,22 +108,21 @@ function showLobbies(array) {
   for (let i = array.length - 1; i > 3; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name + " | Created By: " + array[i].owner}</button></span>
+        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth" id="${array[i].name}">${array[i].name + " | Created By: " + array[i].owner}</button></span>
       </div>` + hold
   }
 
   for (let i = 3; i >= 0; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name}</button></span>
+        <span class="has-text-gray"><button class="button is-success is-medium is-fullwidth" id="${array[i].name}">${array[i].name}</button></span>
       </div>` + hold
       $(`${array[i].name}button`).on('click', handleLobbyClick);
   }
-  //handleLobbyClick();
   return hold;
 }
 
-function handleLobbyClick(name) {
+async function handleLobbyClick(name) {
   let lobby;
   for (let i = 0; i < allLobbies.length; i++) {
     if (name == allLobbies[i].name) {
@@ -134,8 +131,16 @@ function handleLobbyClick(name) {
   }
 
   $(`#${name}`).on("click", function () {
-    console.log("does this work");
-    lobby.users.push(localStorage['typing-username']);
+    document.getElementById("hope").innerHTML = `${lobby.name + " Room"}`;
+    document.getElementById("users-section-text-container").innerHTML = `${lobby.users}`;
+    //$('#lobbies-prompt-background').remove();
+    if (localStorage.jwt) {
+      if (!lobby.users.includes(localStorage['typing-username'])) {
+        lobby.users.push(localStorage['typing-username']);
+      }
+    } else {
+      lobby.users.push("Guest 007");
+    }
   })
 }
 
