@@ -1,6 +1,7 @@
 import config from "../config.js";
 
 let url = config.url;
+let allLobbies;
 
 //A lobby class
 export default class Lobby {
@@ -41,6 +42,7 @@ async function createLobbyList() {
   try {
     let lobbies = await getLobbies();
     let lobbyArray = Object.keys(lobbies).map(i => lobbies[i]);
+    allLobbies = lobbyArray;
     $('body').append(`
                   <div class="prompt-background" id="lobbies-prompt-background">
                       <div class="menu-prompt">
@@ -49,7 +51,7 @@ async function createLobbyList() {
                           </p>
   
                           <br>
-                          ${showLobbies(lobbyArray)}                       
+                          ${showLobbies(lobbyArray)}  
                           <br>
   
                           <button class="button is-warning" id="close-prompt">Close</button>
@@ -59,6 +61,11 @@ async function createLobbyList() {
                       </div>
                   </div>
               `);
+    //Gets the lobby that was clicked on and "returns" it?
+    $("button").click(function() {
+      console.log(this.id);
+      handleLobbyClick(this.id);
+    });
     $('#close-prompt').on('click', function (e) {
       $('#lobbies-prompt-background').remove();
       e.preventDefault();
@@ -103,17 +110,33 @@ function showLobbies(array) {
   for (let i = array.length - 1; i > 3; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}button">${array[i].name + " | Created By: " + array[i].owner}</button></span>
+        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name + " | Created By: " + array[i].owner}</button></span>
       </div>` + hold
   }
 
   for (let i = 3; i >= 0; i--) {
     hold =
       `<div>
-        <span class="has-text-gray"><button id="${array[i].name}button">${array[i].name}</button></span>
+        <span class="has-text-gray"><button id="${array[i].name}">${array[i].name}</button></span>
       </div>` + hold
+      $(`${array[i].name}button`).on('click', handleLobbyClick);
   }
+  //handleLobbyClick();
   return hold;
+}
+
+function handleLobbyClick(name) {
+  let lobby;
+  for (let i = 0; i < allLobbies.length; i++) {
+    if (name == allLobbies[i].name) {
+      lobby = allLobbies[i];
+    }
+  }
+
+  $(`#${name}`).on("click", function () {
+    console.log("does this work");
+    lobby.users.push(localStorage['typing-username']);
+  })
 }
 
 function createALobby() {

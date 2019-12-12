@@ -136,13 +136,6 @@ function handleThemeButtonPress(e) {
 }
 
 /**
- * Enter into a lobby when a lobby is clicked
- */
-function handleLobbyClick() {
-  
-}
-
-/**
  * After the page finishes loading, renders everything and sets up event listeners
  */
 $(function() {
