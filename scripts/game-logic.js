@@ -5,7 +5,7 @@ function loadTextToType(textAsHTML) {
     $('#text-to-type').html(textAsHTML);
 }
 
-function getText() {
+async function getText(lobbyName) {
     let text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
@@ -32,12 +32,21 @@ function getText() {
         Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac 
         habitasse platea dictumst.`;
 
-        /* Gr8 b8, m8. I rel8, str8 appreci8, and congratul8. 
-        I r8 this b8 an 8/8. Plz no h8, I’m str8 ir8. 
-        Cre8 more, can’t w8. We should convers8, I won’t ber8, 
-        my number is 8888888, ask for N8. No calls l8 or out of st8. 
-        If on a d8, ask K8 to loc8. Even with a full pl8, 
-        I always have time to communic8 so don’t hesit8 */
+    if (!lobbyName) {
+        return text;
+    } else {
+        try {
+            let lobbyText = (await axios({
+                method: 'get',
+                url: url + '/public/Lobbies/' + lobbyName,
+            })).data.result['text'];
+            text = lobbyText;
+        } catch {
+            text = `Error: failed to load lobby. Please try reloading!
+                    PLEASE DO NOT TRY TYPING THIS!`
+                    + text;
+        }
+    }
     return text;
 }
 
@@ -156,6 +165,9 @@ async function createGameOverPrompt(currentWordNum, userTypedWords, originalWord
             $('#save-results-message').replace(updateProfileSuccessMessage);
         }
     });
+
+    // Reallow clicking the lobby button once the game has ended
+    $('#lobby-button').css('pointer-events', 'auto');
 }
 
 function updateErrorDisplay(errorCount) {
@@ -203,14 +215,18 @@ function getAdjustedWPM(currentWordNum, userTypedWords, originalWords, timeElaps
     return Math.round(adjustedCharsTyped / 5 * 60 / (timeElapsedMS / 1000));
 }
 
-export default function loadTypingGame() {
+export default async function loadTypingGame(lobbyName) {
+    // Disable functions for any earlier games that had loaded
+    $('#user-input').off();
+    
+    
     // Current settings are for word-based detection, 
     // as opposed to character-based detection
     let $input = $('#user-input');
     let $text = $('#text-to-type');
     $input.prop('disabled', false);
     
-    let text = getText();
+    let text = await getText(lobbyName);
 
     // Perform pre-processing on the text data
     let textWordsArray = text.split(' ').filter(function(word) {
@@ -221,7 +237,9 @@ export default function loadTypingGame() {
     let textAsHTML = '';
     let counter = 0;
     for (let word of textWordsArray) {
-        textAsHTML += '<span id="' + counter + 'word">' + word + '</span>' + ' ';
+        // Get rid of any new lines that may have stuck around
+        let fixedWord = word.replace(/\r?\n|\r/g, '');
+        textAsHTML += '<span id="' + counter + 'word">' + fixedWord + '</span>' + ' ';
         counter++;
     }
     loadTextToType(textAsHTML);
@@ -244,7 +262,7 @@ export default function loadTypingGame() {
 
     // Variables required for game logic
     let charNumOfWord = 0;
-    let globalCharNum = 0;
+    let globalCharNum = 0; // Not used for now
     let currentWordNum = 0;
     let typedWords = new Array(numTotalWords).fill('');
     let wordErrorNum = 0;
@@ -252,6 +270,22 @@ export default function loadTypingGame() {
     let startTime = null;
     let endTime = null;
     let wpm = 0;
+    let timeAllowedMS = 60000; // default 1 minute
+    if (localStorage.jwt) {
+        try {
+            let settingsRequestResult = (await axios({
+                method: 'get',
+                url: url + '/user/settings',
+                headers: { Authorization: "Bearer " + localStorage.jwt }
+            })).data.result;
+
+            timeAllowedMS = settingsRequestResult['Typing Duration']['value']
+                                * 60 * 1000;
+        } catch (e) {
+            // Do nothing on failed HTTP request, 
+            // keep time at default 1 minute
+        }
+    }
 
     function startCountdownTimer(allowedTime) {
         setTimeout(triggerGameOver, allowedTime);
@@ -276,7 +310,11 @@ export default function loadTypingGame() {
     function startTimerHelper() {
         $('#0word').addClass('currentWord');
         startTime = new Date().getTime();
-        startCountdownTimer(30000);
+        startCountdownTimer(timeAllowedMS);
+
+        // In the interest of preventing bugs, disallow
+        // switching lobbies while a game is in progress
+        $('#lobby-button').css('pointer-events', 'none');
     }
 
     function triggerGameOver() {
